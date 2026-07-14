@@ -1,6 +1,10 @@
 import { useAuthStore } from "@/store/authStore";
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || "/api";
+// Sanitize the base API URL to dynamically append /api if missing from configured custom domains
+let API_BASE_URL = import.meta.env.VITE_API_URL || "/api";
+if (API_BASE_URL.startsWith("http") && !API_BASE_URL.endsWith("/api")) {
+  API_BASE_URL = `${API_BASE_URL.replace(/\/$/, "")}/api`;
+}
 
 interface RequestOptions extends RequestInit {
   params?: Record<string, string | number | boolean>;
