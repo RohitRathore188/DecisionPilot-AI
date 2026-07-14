@@ -78,17 +78,123 @@ export default function ReportsPage() {
 
   const handleCSVDownload = (format: "csv" | "excel") => {
     setExporting(format);
+
     setTimeout(() => {
-      // Generate client-side text download file
-      const blob = new Blob([activeRep.csvContent], { type: "text/csv;charset=utf-8;" });
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement("a");
-      link.setAttribute("href", url);
-      link.setAttribute("download", `${activeRep.name.toLowerCase().replace(/\s+/g, "_")}.${format === "excel" ? "xls" : "csv"}`);
-      link.style.visibility = "hidden";
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
+      const lines = activeRep.csvContent.split("\n");
+      const headers = lines[0].split(",");
+      const rows = lines.slice(1).map((r) => r.split(","));
+      const fileName = activeRep.name.toLowerCase().replace(/\s+/g, "_");
+
+      if (format === "csv") {
+        // -------------------------------------------------------
+        // CSV Export: UTF-8 BOM + RFC 4180 quoting
+        // BOM (\uFEFF) tells Excel to use UTF-8 so ₹ renders correctly
+        // -------------------------------------------------------
+        const escape = (val: string) => {
+          const v = val.trim();
+          // Wrap in quotes if the value contains comma, quote, or newline
+          return /[,"\n]/.test(v) ? `"${v.replace(/"/g, '""')}"` : v;
+        };
+        const csvLines = [
+          headers.map(escape).join(","),
+          ...rows.map((row) => row.map(escape).join(",")),
+        ].join("\r\n");
+
+        const BOM = "\uFEFF";
+        const blob = new Blob([BOM + csvLines], { type: "text/csv;charset=utf-8;" });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = `${fileName}.csv`;
+        link.style.visibility = "hidden";
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+
+      } else {
+        // -------------------------------------------------------
+        // Excel Export: SpreadsheetML XML format
+        // Generates a real .xlsx-compatible file — no "format
+        // mismatch" warning in Excel, with styled header row.
+        // -------------------------------------------------------
+        const escapeXml = (val: string) =>
+          val.trim()
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;");
+
+        const headerCells = headers
+          .map((h) => `<Cell ss:StyleID="header"><Data ss:Type="String">${escapeXml(h)}</Data></Cell>`)
+          .join("");
+
+        const dataRows = rows
+          .map((row) => {
+            const cells = row
+              .map((val) => {
+                const v = escapeXml(val);
+                // Try to parse as number (strip ₹ and % signs)
+                const numeric = parseFloat(v.replace(/[₹%,]/g, ""));
+                const isNum = !isNaN(numeric) && v.replace(/[₹%,\s]/g, "") !== "";
+                return isNum
+                  ? `<Cell ss:StyleID="data"><Data ss:Type="Number">${numeric}</Data></Cell>`
+                  : `<Cell ss:StyleID="data"><Data ss:Type="String">${v}</Data></Cell>`;
+              })
+              .join("");
+            return `<Row>${cells}</Row>`;
+          })
+          .join("");
+
+        const xml = `<?xml version="1.0" encoding="UTF-8"?>
+<?mso-application progid="Excel.Sheet"?>
+<Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet"
+  xmlns:o="urn:schemas-microsoft-com:office:office"
+  xmlns:x="urn:schemas-microsoft-com:office:excel"
+  xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet">
+  <Styles>
+    <Style ss:ID="header">
+      <Font ss:Bold="1" ss:Size="11" ss:Color="#FFFFFF"/>
+      <Interior ss:Color="#4F46E5" ss:Pattern="Solid"/>
+      <Alignment ss:Horizontal="Center" ss:Vertical="Center"/>
+      <Borders>
+        <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="2" ss:Color="#312E81"/>
+      </Borders>
+    </Style>
+    <Style ss:ID="data">
+      <Font ss:Size="10" ss:Color="#111827"/>
+      <Alignment ss:Vertical="Center"/>
+      <Borders>
+        <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E5E7EB"/>
+      </Borders>
+    </Style>
+  </Styles>
+  <Worksheet ss:Name="${escapeXml(activeRep.name)}">
+    <Table ss:DefaultRowHeight="20">
+      <Row ss:Height="24">${headerCells}</Row>
+      ${dataRows}
+    </Table>
+    <WorksheetOptions xmlns="urn:schemas-microsoft-com:office:excel">
+      <FreezePanes/>
+      <FrozenNoSplit/>
+      <SplitHorizontal>1</SplitHorizontal>
+      <TopRowBottomPane>1</TopRowBottomPane>
+    </WorksheetOptions>
+  </Worksheet>
+</Workbook>`;
+
+        const blob = new Blob([xml], { type: "application/vnd.ms-excel;charset=utf-8;" });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = `${fileName}.xls`;
+        link.style.visibility = "hidden";
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+      }
+
       setExporting(null);
     }, 900);
   };
