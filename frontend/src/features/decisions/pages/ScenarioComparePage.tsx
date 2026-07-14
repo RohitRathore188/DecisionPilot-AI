@@ -107,9 +107,156 @@ export default function ScenarioComparePage() {
   , activeStrategies[0]);
 
   const handleExportPDF = () => {
-    // Print window triggers native system PDF generator styled nicely for printing
-    window.print();
+    const now = new Date();
+    const dateStr = now.toLocaleDateString("en-IN", { year: "numeric", month: "long", day: "numeric" });
+
+    const riskBadge = (risk: Strategy["risk"]) => {
+      const color = risk === "Low" ? "#16a34a" : risk === "Medium" ? "#d97706" : "#dc2626";
+      const bg = risk === "Low" ? "#dcfce7" : risk === "Medium" ? "#fef9c3" : "#fee2e2";
+      return `<span style="background:${bg};color:${color};border-radius:999px;padding:2px 10px;font-size:10px;font-weight:700;display:inline-block">${risk}</span>`;
+    };
+
+    const tableRows = activeStrategies.map((s) => `
+      <tr style="border-bottom:1px solid #e5e7eb;${s.id === bestOption.id ? "background:#f0fdf4;" : ""}">
+        <td style="padding:14px 16px;font-weight:700;color:#111827;font-size:13px">
+          ${s.id === bestOption.id ? "⭐ " : ""}${s.name}
+        </td>
+        <td style="padding:14px 16px;text-align:right;font-family:monospace;font-size:13px;color:#374151">₹${s.revenue.toLocaleString()}</td>
+        <td style="padding:14px 16px;text-align:right;font-family:monospace;font-size:13px;color:#374151">₹${s.cost.toLocaleString()}</td>
+        <td style="padding:14px 16px;text-align:right;font-family:monospace;font-size:13px;color:#16a34a;font-weight:700">₹${s.profit.toLocaleString()}</td>
+        <td style="padding:14px 16px;text-align:center">${riskBadge(s.risk)}</td>
+        <td style="padding:14px 16px;font-size:12px;color:#374151">${s.inventory}</td>
+        <td style="padding:14px 16px;font-size:12px;color:#6b7280;max-width:200px">${s.recommendation}</td>
+      </tr>
+    `).join("");
+
+    const htmlContent = `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Scenario Comparison Report — DecisionPilot AI</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #fff; color: #111827; padding: 40px; }
+    @media print {
+      body { padding: 20px; }
+      .no-print { display: none !important; }
+      @page { margin: 20mm; size: A4 landscape; }
+    }
+    .header { display: flex; justify-content: space-between; align-items: flex-start; padding-bottom: 24px; border-bottom: 2px solid #111827; margin-bottom: 32px; }
+    .logo { font-size: 22px; font-weight: 900; letter-spacing: -0.5px; }
+    .logo span { color: #6366f1; }
+    .meta { text-align: right; font-size: 12px; color: #6b7280; }
+    .meta strong { display: block; font-size: 18px; font-weight: 800; color: #111827; margin-bottom: 4px; }
+    .highlights { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 32px; }
+    .highlight-card { border-radius: 12px; padding: 20px; }
+    .highlight-card.best { background: #f0fdf4; border: 1.5px solid #86efac; }
+    .highlight-card.worst { background: #fff1f2; border: 1.5px solid #fca5a5; }
+    .highlight-card .label { font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+    .highlight-card.best .label { color: #16a34a; }
+    .highlight-card.worst .label { color: #dc2626; }
+    .highlight-card h3 { font-size: 14px; font-weight: 800; color: #111827; margin-bottom: 6px; }
+    .highlight-card p { font-size: 12px; color: #6b7280; margin-bottom: 14px; line-height: 1.5; }
+    .highlight-card .stats { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; border-top: 1px solid rgba(0,0,0,0.08); padding-top: 12px; }
+    .highlight-card .stat-label { font-size: 10px; font-weight: 600; color: #9ca3af; margin-bottom: 4px; }
+    .highlight-card .stat-value { font-size: 14px; font-weight: 800; color: #111827; }
+    .roi-badge { float: right; font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: 999px; }
+    .roi-badge.best { background: #dcfce7; color: #16a34a; }
+    .roi-badge.worst { background: #fee2e2; color: #dc2626; }
+    .section-title { font-size: 13px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; color: #6b7280; margin-bottom: 12px; }
+    table { width: 100%; border-collapse: collapse; }
+    thead tr { background: #f9fafb; }
+    thead th { padding: 12px 16px; text-align: left; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #6b7280; border-bottom: 2px solid #e5e7eb; }
+    thead th:not(:first-child) { text-align: right; }
+    thead th:nth-child(5) { text-align: center; }
+    thead th:nth-child(6), thead th:nth-child(7) { text-align: left; }
+    tbody tr:last-child { border-bottom: none; }
+    .footer { margin-top: 32px; padding-top: 16px; border-top: 1px solid #e5e7eb; display: flex; justify-content: space-between; align-items: center; }
+    .footer p { font-size: 11px; color: #9ca3af; }
+    .print-btn { no-print: true; margin-bottom: 20px; }
+    button { background: #6366f1; color: white; border: none; padding: 10px 24px; border-radius: 8px; font-size: 14px; font-weight: 700; cursor: pointer; }
+  </style>
+</head>
+<body>
+  <div class="print-btn no-print">
+    <button onclick="window.print()">⬇ Save as PDF</button>
+  </div>
+
+  <div class="header">
+    <div class="logo">Decision<span>Pilot</span> AI</div>
+    <div class="meta">
+      <strong>Scenario Comparison Report</strong>
+      Generated on ${dateStr}<br/>
+      Workspace: Demo &nbsp;|&nbsp; ${activeStrategies.length} strategies compared
+    </div>
+  </div>
+
+  <div class="section-title">Strategic Highlights</div>
+  <div class="highlights">
+    <div class="highlight-card best">
+      <div class="label">👍 Best Strategic Option <span class="roi-badge best">${bestOption.roi}% ROI</span></div>
+      <h3>${bestOption.name}</h3>
+      <p>${bestOption.recommendation}</p>
+      <div class="stats">
+        <div>
+          <div class="stat-label">Expected Net Profit</div>
+          <div class="stat-value">₹${bestOption.profit.toLocaleString()}</div>
+        </div>
+        <div>
+          <div class="stat-label">Inventory Buffer</div>
+          <div class="stat-value">${bestOption.inventory}</div>
+        </div>
+      </div>
+    </div>
+    <div class="highlight-card worst">
+      <div class="label">👎 High Risk / Low Return <span class="roi-badge worst">${worstOption.roi}% ROI</span></div>
+      <h3>${worstOption.name}</h3>
+      <p>${worstOption.recommendation}</p>
+      <div class="stats">
+        <div>
+          <div class="stat-label">Expected Net Profit</div>
+          <div class="stat-value">₹${worstOption.profit.toLocaleString()}</div>
+        </div>
+        <div>
+          <div class="stat-label">Inventory Buffer</div>
+          <div class="stat-value">${worstOption.inventory}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-title">Full Strategy Comparison</div>
+  <table>
+    <thead>
+      <tr>
+        <th>Strategy Name</th>
+        <th style="text-align:right">Expected Revenue</th>
+        <th style="text-align:right">Expected Costs</th>
+        <th style="text-align:right">Expected Profit</th>
+        <th style="text-align:center">Risk Level</th>
+        <th>Inventory Safety</th>
+        <th>AI Recommendation Summary</th>
+      </tr>
+    </thead>
+    <tbody>${tableRows}</tbody>
+  </table>
+
+  <div class="footer">
+    <p>DecisionPilot AI — Confidential Business Report</p>
+    <p>Generated ${dateStr} &nbsp;|&nbsp; AI-Powered Decision Intelligence</p>
+  </div>
+</body>
+</html>`;
+
+    const printWindow = window.open("", "_blank", "width=1200,height=800");
+    if (!printWindow) return;
+    printWindow.document.write(htmlContent);
+    printWindow.document.close();
+    printWindow.focus();
+    // Auto-trigger print after content loads
+    printWindow.onload = () => printWindow.print();
   };
+
 
   const getRiskColor = (risk: Strategy["risk"]) => {
     switch (risk) {
