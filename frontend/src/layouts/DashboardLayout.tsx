@@ -19,6 +19,7 @@ import {
   ArrowRight,
   LineChart,
   Sparkles,
+  Network,
   Package,
   Truck,
   FileText
@@ -52,6 +53,7 @@ export default function DashboardLayout() {
     { name: "Analytics Engine", href: "/analytics", icon: LineChart },
     { name: "Compare Scenarios", href: "/compare", icon: Activity },
     { name: "AI Copilot", href: "/copilot", icon: Sparkles },
+    { name: "Knowledge Graph", href: "/graph", icon: Network },
     { name: "Inventory Intel", href: "/inventory", icon: Package },
     { name: "Supplier Intel", href: "/suppliers", icon: Truck },
     { name: "Fulfillment Reports", href: "/reports", icon: FileText },

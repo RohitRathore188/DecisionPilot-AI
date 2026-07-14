@@ -27,8 +27,8 @@ class Settings(BaseSettings):
   ] = Field(default=["http://localhost:5173", "http://127.0.0.1:5173"])
 
   # Supabase variables
-  SUPABASE_URL: str = ""
-  SUPABASE_KEY: str = ""
+  SUPABASE_URL: str = Field(default="", validation_alias="VITE_SUPABASE_URL")
+  SUPABASE_KEY: str = Field(default="", validation_alias="VITE_SUPABASE_ANON_KEY")
   SUPABASE_JWT_SECRET: str = ""
 
   # Gemini API Key

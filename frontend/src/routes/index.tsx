@@ -20,6 +20,7 @@ const CopilotPage = React.lazy(() => import("@/features/copilot/pages/CopilotPag
 const InventoryPage = React.lazy(() => import("@/features/inventory/pages/InventoryPage"));
 const SupplierPage = React.lazy(() => import("@/features/suppliers/pages/SupplierPage"));
 const ReportsPage = React.lazy(() => import("@/features/reports/pages/ReportsPage"));
+const KnowledgeGraphPage = React.lazy(() => import("@/features/graph/pages/KnowledgeGraphPage"));
 
 /**
  * Route protection wrapper. Checks session presence and validates role permissions.
@@ -140,6 +141,7 @@ export default function AppRoutes() {
             <Route path="/inventory" element={<InventoryPage />} />
             <Route path="/suppliers" element={<SupplierPage />} />
             <Route path="/reports" element={<ReportsPage />} />
+            <Route path="/graph" element={<KnowledgeGraphPage />} />
             
             {/* Limit simulation configuration to owner / admin roles */}
             <Route 

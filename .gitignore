@@ -5,10 +5,10 @@ frontend/dist-ssr/
 frontend/*.local
 
 # Python/Backend dependencies
-backend/__pycache__/
-backend/*.pyc
-backend/*.pyo
-backend/*.pyd
+**/__pycache__/
+*.pyc
+*.pyo
+*.pyd
 backend/.pytest_cache/
 backend/.venv/
 backend/venv/
