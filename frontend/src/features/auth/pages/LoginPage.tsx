@@ -71,7 +71,7 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="relative flex min-h-screen items-center justify-center bg-[#030303] text-[#f5f5f7] px-6 select-none">
+    <div className="dark relative flex min-h-screen items-center justify-center bg-[#030303] text-[#f5f5f7] px-6 select-none">
       
       {/* Siri Ambient Glow Background Layer */}
       <div className="ambient-container">

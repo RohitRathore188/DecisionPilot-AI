@@ -61,7 +61,7 @@ export default function LandingPage() {
   ];
 
   return (
-    <div className="relative min-h-screen overflow-hidden bg-[#030303] text-[#f5f5f7] select-none">
+    <div className="dark relative min-h-screen overflow-hidden bg-[#030303] text-[#f5f5f7] select-none">
       
       {/* Siri Ambient Glow Background Layer */}
       <div className="ambient-container">
