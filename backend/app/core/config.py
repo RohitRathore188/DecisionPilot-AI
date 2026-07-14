@@ -24,7 +24,14 @@ class Settings(BaseSettings):
   # CORS configuration
   BACKEND_CORS_ORIGINS: Annotated[
     Union[List[str], str], BeforeValidator(parse_cors)
-  ] = Field(default=["http://localhost:5173", "http://127.0.0.1:5173", "https://decision-pilot-ai-alpha.vercel.app"])
+  ] = Field(default=[
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+    "https://decision-pilot-ai-alpha.vercel.app",
+    "https://decisionpilot-ai-alpha.vercel.app",
+  ])
 
   # Supabase variables
   SUPABASE_URL: str = Field(default="", validation_alias="VITE_SUPABASE_URL")

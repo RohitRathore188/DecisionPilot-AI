@@ -1,9 +1,28 @@
 import { useAuthStore } from "@/store/authStore";
 
-// Sanitize the base API URL to dynamically append /api if missing from configured custom domains
-let API_BASE_URL = import.meta.env.VITE_API_URL || "/api";
-if (API_BASE_URL.startsWith("http") && !API_BASE_URL.endsWith("/api")) {
-  API_BASE_URL = `${API_BASE_URL.replace(/\/$/, "")}/api`;
+// ---------------------------------------------------------------------------
+// API Base URL Resolution
+// ---------------------------------------------------------------------------
+// - LOCAL DEV: If VITE_API_URL is not set, use "/api" which gets proxied by
+//   Vite dev server to http://localhost:8000/api (see vite.config.ts).
+//   This avoids CORS entirely since both frontend and API share the same origin.
+//
+// - PRODUCTION: Set VITE_API_URL to the full backend URL including /api/v1
+//   e.g. "https://your-backend.onrender.com/api/v1"
+// ---------------------------------------------------------------------------
+const rawApiUrl = import.meta.env.VITE_API_URL || "";
+
+let API_BASE_URL: string;
+if (rawApiUrl) {
+  // Production: use the explicitly configured URL
+  // Ensure it ends with /api if it doesn't already
+  API_BASE_URL = rawApiUrl.replace(/\/$/, "");
+  if (API_BASE_URL.startsWith("http") && !API_BASE_URL.endsWith("/api") && !API_BASE_URL.includes("/api/")) {
+    API_BASE_URL = `${API_BASE_URL}/api`;
+  }
+} else {
+  // Local dev: relative path gets handled by Vite proxy
+  API_BASE_URL = "/api";
 }
 
 interface RequestOptions extends RequestInit {
