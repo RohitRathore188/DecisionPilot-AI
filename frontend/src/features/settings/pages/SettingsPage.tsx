@@ -1,10 +1,7 @@
 import { useState } from "react";
-import { useThemeStore } from "@/store/themeStore";
 import { useAuthStore } from "@/store/authStore";
 import { 
   Moon, 
-  Sun, 
-  Laptop, 
   LogOut, 
   Sparkles, 
   Key, 
@@ -15,7 +12,6 @@ import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 
 export default function SettingsPage() {
-  const { theme, setTheme } = useThemeStore();
   const { user, logout } = useAuthStore();
 
   // Settings State Hooks
@@ -41,11 +37,6 @@ export default function SettingsPage() {
   const [apiKey, setApiKey] = useState("dp_live_948f2a1b9e8382c7d42f");
   const [keyVisible, setKeyVisible] = useState(false);
 
-  const themeOptions = [
-    { value: "light", label: "Light Mode", icon: Sun },
-    { value: "dark", label: "OLED Dark", icon: Moon },
-    { value: "system", label: "System Sync", icon: Laptop },
-  ] as const;
 
   const handleGenerateKey = () => {
     const randomHex = Array.from({ length: 20 }, () => 
@@ -72,7 +63,7 @@ export default function SettingsPage() {
           <Card className="apple-glass border-white/5 p-4 space-y-2">
             {[
               { id: "profile", name: "Business Profile", icon: Building },
-              { id: "appearance", name: "Appearance & Theme", icon: Sun },
+              { id: "appearance", name: "Appearance & Theme", icon: Moon },
               { id: "ai", name: "AI Preferences", icon: Sparkles },
               { id: "security", name: "API & Security Keys", icon: Key }
             ].map((tab) => {
@@ -197,33 +188,21 @@ export default function SettingsPage() {
           {activeTab === "appearance" && (
             <Card className="apple-glass border-white/5 p-6 space-y-6">
               <div className="flex items-center gap-2 border-b border-white/5 pb-3">
-                <Sun className="h-4.5 w-4.5 text-primary" />
+                <Moon className="h-4.5 w-4.5 text-primary" />
                 <h3 className="text-xs font-bold uppercase tracking-wider text-white">Appearance & Theme Style</h3>
               </div>
 
               {/* Theme choices */}
               <div className="space-y-3">
                 <span className="text-[10px] font-bold text-muted-foreground uppercase block">Interface Theme</span>
-                <div className="grid grid-cols-3 gap-4">
-                  {themeOptions.map((opt) => {
-                    const Icon = opt.icon;
-                    const active = theme === opt.value;
-                    return (
-                      <button
-                        key={opt.value}
-                        type="button"
-                        onClick={() => setTheme(opt.value)}
-                        className={`flex flex-col items-center justify-center p-4.5 rounded-2xl border transition-all ${
-                          active
-                            ? "border-primary bg-primary/5 text-primary shadow-apple-subtle"
-                            : "border-white/5 bg-white/[0.01] text-muted-foreground hover:bg-white/[0.04] hover:text-white"
-                        }`}
-                      >
-                        <Icon className="h-5 w-5 mb-2" />
-                        <span className="text-xs font-bold">{opt.label}</span>
-                      </button>
-                    );
-                  })}
+                <div className="p-4.5 rounded-2xl border border-primary bg-primary/5 text-primary shadow-apple-subtle flex items-center gap-4">
+                  <Moon className="h-6 w-6 text-primary shrink-0" />
+                  <div>
+                    <span className="text-xs font-bold text-white block">OLED Dark Mode Enforced</span>
+                    <span className="text-[10px] text-muted-foreground font-semibold block mt-0.5">
+                      DecisionPilot AI is optimized exclusively for OLED Dark Mode to render visual graphs and glowing decision nodes clearly.
+                    </span>
+                  </div>
                 </div>
               </div>
 

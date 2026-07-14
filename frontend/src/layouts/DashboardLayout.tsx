@@ -9,8 +9,6 @@ import {
   BarChart3, 
   Settings as SettingsIcon, 
   PlusCircle, 
-  Sun, 
-  Moon, 
   LogOut, 
   Search, 
   Command, 
@@ -29,7 +27,7 @@ export default function DashboardLayout() {
   const location = useLocation();
   const navigate = useNavigate();
   const { user, logout } = useAuthStore();
-  const { theme, setTheme } = useThemeStore();
+  useThemeStore();
   const decisions = useDecisionStore((state) => state.decisions);
   
   const [searchOpen, setSearchOpen] = useState(false);
@@ -66,9 +64,6 @@ export default function DashboardLayout() {
     navigate("/");
   };
 
-  const toggleTheme = () => {
-    setTheme(theme === "dark" ? "light" : "dark");
-  };
 
   const filteredDecisions = searchQuery
     ? decisions.filter(
@@ -148,22 +143,6 @@ export default function DashboardLayout() {
 
         {/* Sidebar Dock Controls Footer */}
         <div className="p-4 border-t border-border/20 space-y-2.5">
-          <button
-            onClick={toggleTheme}
-            className="flex items-center gap-3 w-full h-10 px-4 rounded-xl text-xs font-bold text-muted-foreground hover:bg-secondary/40 hover:text-foreground transition-all"
-          >
-            {theme === "dark" ? (
-              <>
-                <Sun className="h-4 w-4 text-amber-500" />
-                <span>Light Theme</span>
-              </>
-            ) : (
-              <>
-                <Moon className="h-4 w-4 text-indigo-500" />
-                <span>Dark Theme</span>
-              </>
-            )}
-          </button>
 
           <button
             onClick={handleLogout}

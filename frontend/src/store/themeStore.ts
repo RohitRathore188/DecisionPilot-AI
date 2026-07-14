@@ -1,6 +1,6 @@
 import { create } from "zustand";
 
-export type Theme = "light" | "dark" | "system";
+export type Theme = "dark";
 
 interface ThemeState {
   theme: Theme;
@@ -9,37 +9,24 @@ interface ThemeState {
 }
 
 /**
- * Zustand store to manage active UI theme (light, dark, or system preferences).
+ * Zustand store to manage active UI theme (enforced to dark).
  */
 export const useThemeStore = create<ThemeState>((set, get) => ({
-  theme: (localStorage.getItem("decision-pilot-theme") as Theme) || "system",
-  setTheme: (theme) => {
-    localStorage.setItem("decision-pilot-theme", theme);
-    set({ theme });
+  theme: "dark",
+  setTheme: () => {
+    set({ theme: "dark" });
     get().applyTheme();
   },
   applyTheme: () => {
-    const theme = get().theme;
     const root = window.document.documentElement;
-    root.classList.remove("light", "dark");
-
-    if (theme === "system") {
-      const systemTheme = window.matchMedia("(prefers-color-scheme: dark)").matches
-        ? "dark"
-        : "light";
-      root.classList.add(systemTheme);
-    } else {
-      root.classList.add(theme);
-    }
+    root.classList.remove("light");
+    root.classList.add("dark");
   },
 }));
 
-// Set up system theme listener on import (for runtime OS changes)
+// Force dark mode immediately on script evaluation
 if (typeof window !== "undefined") {
-  window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", () => {
-    const { theme, applyTheme } = useThemeStore.getState();
-    if (theme === "system") {
-      applyTheme();
-    }
-  });
+  const root = window.document.documentElement;
+  root.classList.remove("light");
+  root.classList.add("dark");
 }
