@@ -1,10 +1,7 @@
 from fastapi import FastAPI
-from starlette.middleware.base import BaseHTTPMiddleware
-from starlette.requests import Request
-from starlette.responses import Response
+from fastapi.middleware.cors import CORSMiddleware
 from app.core.config import settings
 from app.api.v1.api import api_router
-import re
 
 app = FastAPI(
   title=settings.PROJECT_NAME,
@@ -14,69 +11,42 @@ app = FastAPI(
 )
 
 # ---------------------------------------------------------------------------
-# Dynamic CORS Middleware
+# CORS Configuration
 # ---------------------------------------------------------------------------
-# Single, authoritative CORS handler.
-# Allows:
-#   1. Any origin in settings.BACKEND_CORS_ORIGINS (exact match)
-#   2. Any *.vercel.app subdomain (Vercel preview + production deployments)
+# Root cause of the bug:
+#   BaseHTTPMiddleware has a known Starlette issue where HTTP exceptions raised
+#   inside route dependencies (e.g. HTTPBearer raising 403 on an OPTIONS
+#   preflight that has no Authorization header) are handled by FastAPI's
+#   exception handler and returned DIRECTLY — bypassing the middleware's
+#   response path entirely. This means CORS headers never get attached to
+#   those error responses, and the browser sees "No Access-Control-Allow-Origin".
 #
-# NOTE: Do NOT add a second CORSMiddleware — Starlette runs middlewares in
-# reverse registration order, so a second one would execute FIRST and reject
-# preflight requests before this handler ever sees them.
+# Fix:
+#   Use FastAPI's built-in CORSMiddleware — it is a pure ASGI middleware
+#   that intercepts ALL requests (including OPTIONS preflight) at a lower
+#   level, before any route or dependency logic runs. It returns the
+#   preflight response immediately, so HTTPBearer never sees it.
+#   Use `allow_origin_regex` for *.vercel.app wildcard support.
 # ---------------------------------------------------------------------------
 
-# Matches any Vercel deployment URL (preview or production)
-VERCEL_ORIGIN_PATTERN = re.compile(r"^https://[a-zA-Z0-9-]+(?:-[a-zA-Z0-9]+)*\.vercel\.app$")
+_explicit_origins = [str(o).rstrip("/") for o in settings.BACKEND_CORS_ORIGINS]
 
-_CORS_HEADERS = {
-    "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS, PATCH",
-    "Access-Control-Allow-Headers": "Authorization, Content-Type, Accept, Origin, X-Requested-With",
-    "Access-Control-Allow-Credentials": "true",
-    "Access-Control-Max-Age": "600",
-}
+# Matches any *.vercel.app URL (Vercel preview and production deployments)
+_VERCEL_REGEX = r"https://[a-zA-Z0-9][a-zA-Z0-9\-]*\.vercel\.app"
 
-class DynamicCORSMiddleware(BaseHTTPMiddleware):
-    """
-    Middleware that dynamically checks the Origin header and injects
-    Access-Control-* headers for allowed origins.
-    """
-    def _is_origin_allowed(self, origin: str) -> bool:
-        if not origin:
-            return False
-        explicit_origins = [str(o).rstrip("/") for o in settings.BACKEND_CORS_ORIGINS]
-        return origin in explicit_origins or bool(VERCEL_ORIGIN_PATTERN.match(origin))
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=_explicit_origins,
+    allow_origin_regex=_VERCEL_REGEX,
+    allow_credentials=True,
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
+    allow_headers=["Authorization", "Content-Type", "Accept", "Origin", "X-Requested-With"],
+    max_age=600,
+)
 
-    async def dispatch(self, request: Request, call_next):
-        origin = request.headers.get("origin", "")
-        allowed = self._is_origin_allowed(origin)
-
-        # Short-circuit preflight (OPTIONS) immediately
-        if request.method == "OPTIONS":
-            if allowed:
-                response = Response(status_code=200)
-                response.headers["Access-Control-Allow-Origin"] = origin
-                for k, v in _CORS_HEADERS.items():
-                    response.headers[k] = v
-                return response
-            # Return 204 without CORS headers for disallowed origins
-            return Response(status_code=204)
-
-        response = await call_next(request)
-
-        if allowed:
-            response.headers["Access-Control-Allow-Origin"] = origin
-            for k, v in _CORS_HEADERS.items():
-                response.headers[k] = v
-
-        return response
-
-# Register as the sole CORS middleware
-app.add_middleware(DynamicCORSMiddleware)
-
-# Log allowed origins at startup for debugging
-print(f"[CORS] Explicit allowed origins: {settings.BACKEND_CORS_ORIGINS}")
-print(f"[CORS] Dynamic pattern: *.vercel.app")
+# Log allowed origins at startup
+print(f"[CORS] Explicit origins: {_explicit_origins}")
+print(f"[CORS] Regex pattern: {_VERCEL_REGEX}")
 
 # Include API Router
 app.include_router(api_router, prefix=settings.API_V1_STR)
