@@ -1,5 +1,4 @@
 from fastapi import FastAPI
-from fastapi.middleware.cors import CORSMiddleware
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.requests import Request
 from starlette.responses import Response
@@ -17,64 +16,66 @@ app = FastAPI(
 # ---------------------------------------------------------------------------
 # Dynamic CORS Middleware
 # ---------------------------------------------------------------------------
-# This custom middleware checks the Origin header against configured origins
-# AND dynamically allows any *.vercel.app preview deployment URL.
-# This ensures CORS never breaks for any Vercel preview/production deployment.
+# Single, authoritative CORS handler.
+# Allows:
+#   1. Any origin in settings.BACKEND_CORS_ORIGINS (exact match)
+#   2. Any *.vercel.app subdomain (Vercel preview + production deployments)
+#
+# NOTE: Do NOT add a second CORSMiddleware — Starlette runs middlewares in
+# reverse registration order, so a second one would execute FIRST and reject
+# preflight requests before this handler ever sees them.
 # ---------------------------------------------------------------------------
 
-# Pattern to match any Vercel deployment preview URL
-VERCEL_ORIGIN_PATTERN = re.compile(r"^https://.*\.vercel\.app$")
+# Matches any Vercel deployment URL (preview or production)
+VERCEL_ORIGIN_PATTERN = re.compile(r"^https://[a-zA-Z0-9-]+(?:-[a-zA-Z0-9]+)*\.vercel\.app$")
+
+_CORS_HEADERS = {
+    "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS, PATCH",
+    "Access-Control-Allow-Headers": "Authorization, Content-Type, Accept, Origin, X-Requested-With",
+    "Access-Control-Allow-Credentials": "true",
+    "Access-Control-Max-Age": "600",
+}
 
 class DynamicCORSMiddleware(BaseHTTPMiddleware):
     """
-    Middleware that dynamically checks the Origin header.
-    Allows:
-      1. Any origin in settings.BACKEND_CORS_ORIGINS (exact match)
-      2. Any *.vercel.app subdomain (for Vercel preview deployments)
+    Middleware that dynamically checks the Origin header and injects
+    Access-Control-* headers for allowed origins.
     """
+    def _is_origin_allowed(self, origin: str) -> bool:
+        if not origin:
+            return False
+        explicit_origins = [str(o).rstrip("/") for o in settings.BACKEND_CORS_ORIGINS]
+        return origin in explicit_origins or bool(VERCEL_ORIGIN_PATTERN.match(origin))
+
     async def dispatch(self, request: Request, call_next):
         origin = request.headers.get("origin", "")
+        allowed = self._is_origin_allowed(origin)
 
-        # Check if origin is allowed
-        is_allowed = (
-            origin in [str(o).rstrip("/") for o in settings.BACKEND_CORS_ORIGINS]
-            or VERCEL_ORIGIN_PATTERN.match(origin)
-        )
-
-        # Handle preflight OPTIONS request
-        if request.method == "OPTIONS" and is_allowed:
-            response = Response(status_code=200)
-            response.headers["Access-Control-Allow-Origin"] = origin
-            response.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS, PATCH"
-            response.headers["Access-Control-Allow-Headers"] = "*"
-            response.headers["Access-Control-Allow-Credentials"] = "true"
-            response.headers["Access-Control-Max-Age"] = "600"
-            return response
+        # Short-circuit preflight (OPTIONS) immediately
+        if request.method == "OPTIONS":
+            if allowed:
+                response = Response(status_code=200)
+                response.headers["Access-Control-Allow-Origin"] = origin
+                for k, v in _CORS_HEADERS.items():
+                    response.headers[k] = v
+                return response
+            # Return 204 without CORS headers for disallowed origins
+            return Response(status_code=204)
 
         response = await call_next(request)
 
-        if is_allowed:
+        if allowed:
             response.headers["Access-Control-Allow-Origin"] = origin
-            response.headers["Access-Control-Allow-Credentials"] = "true"
-            response.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS, PATCH"
-            response.headers["Access-Control-Allow-Headers"] = "*"
+            for k, v in _CORS_HEADERS.items():
+                response.headers[k] = v
 
         return response
 
-# Register custom dynamic CORS middleware
+# Register as the sole CORS middleware
 app.add_middleware(DynamicCORSMiddleware)
 
-# Also keep the standard CORS middleware as a fallback for explicit origins
-app.add_middleware(
-  CORSMiddleware,
-  allow_origins=[str(origin).rstrip("/") for origin in settings.BACKEND_CORS_ORIGINS],
-  allow_credentials=True,
-  allow_methods=["*"],
-  allow_headers=["*"],
-)
-
 # Log allowed origins at startup for debugging
-print(f"[CORS] Allowed origins: {settings.BACKEND_CORS_ORIGINS}")
+print(f"[CORS] Explicit allowed origins: {settings.BACKEND_CORS_ORIGINS}")
 print(f"[CORS] Dynamic pattern: *.vercel.app")
 
 # Include API Router
