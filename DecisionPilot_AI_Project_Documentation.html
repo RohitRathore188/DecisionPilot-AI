@@ -1,0 +1,858 @@
+<!DOCTYPE html>
+<html xmlns:o="urn:schemas-microsoft-com:office:office"
+      xmlns:w="urn:schemas-microsoft-com:office:word"
+      xmlns="http://www.w3.org/TR/REC-html40">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="ProgId" content="Word.Document"/>
+  <meta name="Generator" content="Microsoft Word"/>
+  <title>DecisionPilot AI — Full Project Documentation</title>
+  <style>
+    /* Word-compatible styles */
+    body {
+      font-family: Calibri, 'Segoe UI', Arial, sans-serif;
+      font-size: 11pt;
+      color: #1a1a2e;
+      margin: 72pt 72pt 72pt 72pt;
+      line-height: 1.6;
+    }
+    h1 { font-size: 28pt; font-weight: 900; color: #1e1b4b; margin-bottom: 6pt; page-break-before: always; }
+    h1:first-of-type { page-break-before: avoid; }
+    h2 { font-size: 18pt; font-weight: 800; color: #312e81; margin-top: 24pt; margin-bottom: 8pt; border-bottom: 2pt solid #4f46e5; padding-bottom: 4pt; }
+    h3 { font-size: 13pt; font-weight: 700; color: #4338ca; margin-top: 16pt; margin-bottom: 6pt; }
+    h4 { font-size: 11pt; font-weight: 700; color: #6366f1; margin-top: 12pt; margin-bottom: 4pt; }
+    p  { margin: 6pt 0; font-size: 11pt; }
+    ul, ol { margin: 6pt 0 6pt 24pt; }
+    li { margin: 3pt 0; font-size: 11pt; }
+    table { width: 100%; border-collapse: collapse; margin: 12pt 0; font-size: 10pt; }
+    th { background: #4f46e5; color: #ffffff; padding: 8pt 10pt; text-align: left; font-weight: 700; border: 1pt solid #312e81; }
+    td { padding: 7pt 10pt; border: 1pt solid #d1d5db; vertical-align: top; }
+    tr:nth-child(even) td { background: #f5f3ff; }
+    .cover { text-align: center; padding: 80pt 0 60pt 0; page-break-after: always; }
+    .cover h1 { font-size: 36pt; color: #1e1b4b; page-break-before: avoid; border: none; }
+    .cover .subtitle { font-size: 16pt; color: #6366f1; font-weight: 700; margin: 8pt 0; }
+    .cover .meta { font-size: 11pt; color: #6b7280; margin-top: 24pt; }
+    .cover .divider { border: 2pt solid #4f46e5; width: 80pt; margin: 16pt auto; }
+    .badge { display: inline-block; background: #ede9fe; color: #4f46e5; border: 1pt solid #c4b5fd; border-radius: 4pt; padding: 1pt 6pt; font-size: 9pt; font-weight: 700; margin: 2pt; }
+    .badge-green { background: #dcfce7; color: #16a34a; border-color: #86efac; }
+    .badge-red { background: #fee2e2; color: #dc2626; border-color: #fca5a5; }
+    .badge-amber { background: #fef9c3; color: #d97706; border-color: #fde68a; }
+    .badge-blue { background: #dbeafe; color: #2563eb; border-color: #93c5fd; }
+    .info-box { background: #f0f4ff; border-left: 4pt solid #4f46e5; padding: 10pt 14pt; margin: 12pt 0; border-radius: 0 6pt 6pt 0; }
+    .warn-box { background: #fffbeb; border-left: 4pt solid #f59e0b; padding: 10pt 14pt; margin: 12pt 0; border-radius: 0 6pt 6pt 0; }
+    .success-box { background: #f0fdf4; border-left: 4pt solid #16a34a; padding: 10pt 14pt; margin: 12pt 0; border-radius: 0 6pt 6pt 0; }
+    .page-break { page-break-before: always; }
+    code { font-family: 'Courier New', monospace; background: #f3f4f6; padding: 1pt 4pt; border-radius: 3pt; font-size: 9.5pt; color: #6d28d9; }
+    .toc-item { margin: 4pt 0; }
+    .toc-item a { color: #4338ca; text-decoration: none; }
+    .section-number { color: #9ca3af; margin-right: 6pt; }
+    .arch-box { border: 1.5pt solid #c4b5fd; border-radius: 8pt; padding: 14pt; margin: 10pt 0; background: #faf5ff; }
+    .arch-box .layer-title { font-weight: 800; color: #4f46e5; font-size: 12pt; margin-bottom: 6pt; }
+  </style>
+</head>
+<body>
+
+<!-- ============================================================ COVER PAGE -->
+<div class="cover">
+  <div style="font-size:14pt;color:#9ca3af;letter-spacing:2pt;text-transform:uppercase;margin-bottom:24pt;">PROJECT DOCUMENTATION</div>
+  <div class="divider"></div>
+  <h1 style="font-size:40pt;margin:16pt 0 8pt 0;">DecisionPilot AI</h1>
+  <div class="subtitle">AI-Powered Business Decision Intelligence Platform</div>
+  <div class="divider"></div>
+  <div class="meta">
+    <p><strong>Version:</strong> 1.0.0 &nbsp;|&nbsp; <strong>Status:</strong> Production</p>
+    <p><strong>Deployment:</strong> Vercel (Frontend) &nbsp;+&nbsp; Render (Backend)</p>
+    <p><strong>Repository:</strong> github.com/RohitRathore188/DecisionPilot-AI</p>
+    <p><strong>Date:</strong> July 2026</p>
+    <br/>
+    <p><span class="badge">React + TypeScript</span> <span class="badge">FastAPI</span> <span class="badge">Supabase</span> <span class="badge">Google Gemini AI</span> <span class="badge">Python</span></p>
+  </div>
+</div>
+
+<!-- ============================================================ TABLE OF CONTENTS -->
+<h2>Table of Contents</h2>
+<table style="border:none;">
+  <tr><td style="border:none;padding:3pt 0;"><span class="section-number">1.</span> <a href="#problem">Problem Statement</a></td></tr>
+  <tr><td style="border:none;padding:3pt 0;"><span class="section-number">2.</span> <a href="#overview">Project Overview & Objectives</a></td></tr>
+  <tr><td style="border:none;padding:3pt 0;"><span class="section-number">3.</span> <a href="#architecture">System Architecture</a></td></tr>
+  <tr><td style="border:none;padding:3pt 0;"><span class="section-number">4.</span> <a href="#tech">Technology Stack</a></td></tr>
+  <tr><td style="border:none;padding:3pt 0;"><span class="section-number">5.</span> <a href="#modules">All Modules & Features</a></td></tr>
+  <tr><td style="border:none;padding:3pt 0;">&nbsp;&nbsp;&nbsp;&nbsp;5.1 Landing Page & Marketing</td></tr>
+  <tr><td style="border:none;padding:3pt 0;">&nbsp;&nbsp;&nbsp;&nbsp;5.2 Authentication System</td></tr>
+  <tr><td style="border:none;padding:3pt 0;">&nbsp;&nbsp;&nbsp;&nbsp;5.3 Overview Dashboard</td></tr>
+  <tr><td style="border:none;padding:3pt 0;">&nbsp;&nbsp;&nbsp;&nbsp;5.4 Analytics Engine</td></tr>
+  <tr><td style="border:none;padding:3pt 0;">&nbsp;&nbsp;&nbsp;&nbsp;5.5 Simulate Decision (New Decision)</td></tr>
+  <tr><td style="border:none;padding:3pt 0;">&nbsp;&nbsp;&nbsp;&nbsp;5.6 Decision Details & Results</td></tr>
+  <tr><td style="border:none;padding:3pt 0;">&nbsp;&nbsp;&nbsp;&nbsp;5.7 Compare Scenarios</td></tr>
+  <tr><td style="border:none;padding:3pt 0;">&nbsp;&nbsp;&nbsp;&nbsp;5.8 AI Copilot</td></tr>
+  <tr><td style="border:none;padding:3pt 0;">&nbsp;&nbsp;&nbsp;&nbsp;5.9 Knowledge Graph</td></tr>
+  <tr><td style="border:none;padding:3pt 0;">&nbsp;&nbsp;&nbsp;&nbsp;5.10 Inventory Intel</td></tr>
+  <tr><td style="border:none;padding:3pt 0;">&nbsp;&nbsp;&nbsp;&nbsp;5.11 Supplier Intel</td></tr>
+  <tr><td style="border:none;padding:3pt 0;">&nbsp;&nbsp;&nbsp;&nbsp;5.12 Fulfillment Reports</td></tr>
+  <tr><td style="border:none;padding:3pt 0;">&nbsp;&nbsp;&nbsp;&nbsp;5.13 Settings</td></tr>
+  <tr><td style="border:none;padding:3pt 0;"><span class="section-number">6.</span> <a href="#backend">Backend API Reference</a></td></tr>
+  <tr><td style="border:none;padding:3pt 0;"><span class="section-number">7.</span> <a href="#security">Security & Authentication</a></td></tr>
+  <tr><td style="border:none;padding:3pt 0;"><span class="section-number">8.</span> <a href="#deployment">Deployment Architecture</a></td></tr>
+  <tr><td style="border:none;padding:3pt 0;"><span class="section-number">9.</span> <a href="#dataflow">Data Flow & Integration</a></td></tr>
+  <tr><td style="border:none;padding:3pt 0;"><span class="section-number">10.</span> <a href="#future">Future Enhancements</a></td></tr>
+</table>
+
+<!-- ============================================================ SECTION 1: PROBLEM STATEMENT -->
+<h1 id="problem">1. Problem Statement</h1>
+
+<h2>1.1 The Core Business Challenge</h2>
+<p>Small and Medium Enterprises (SMEs) — particularly in the food service, retail, and catering industries — face a critical and recurring challenge: <strong>making high-stakes business decisions without access to data-driven intelligence tools.</strong></p>
+
+<p>Traditional decision-making in SMEs relies on:</p>
+<ul>
+  <li>Gut feelings and past experience, without quantitative backing</li>
+  <li>Manual spreadsheet analysis that is error-prone and time-consuming</li>
+  <li>Expensive external consultants who are not accessible 24/7</li>
+  <li>Siloed business data — inventory, suppliers, financials — that is never correlated</li>
+  <li>Reactive rather than proactive operational strategies</li>
+</ul>
+
+<h2>1.2 Specific Pain Points Addressed</h2>
+<table>
+  <tr><th>Pain Point</th><th>Impact on Business</th><th>DecisionPilot AI Solution</th></tr>
+  <tr>
+    <td>No scenario comparison tools</td>
+    <td>Decisions made on single-point estimates; no understanding of risk</td>
+    <td>Multi-scenario Monte Carlo simulation with ROI comparison</td>
+  </tr>
+  <tr>
+    <td>Inventory mismanagement</td>
+    <td>Stockouts or overstock leading to waste and lost revenue</td>
+    <td>Real-time stock level monitoring with AI restock predictions</td>
+  </tr>
+  <tr>
+    <td>Supplier dependency risk</td>
+    <td>Single-supplier reliance creates fragile supply chains</td>
+    <td>Supplier reliability scoring and multi-supplier comparison</td>
+  </tr>
+  <tr>
+    <td>No financial forecasting</td>
+    <td>Operating blind with no projection of revenues and costs</td>
+    <td>Multi-scenario revenue, cost, and profit projections</td>
+  </tr>
+  <tr>
+    <td>Disconnected data</td>
+    <td>Suppliers, inventory, orders, and revenue never linked</td>
+    <td>Interactive Knowledge Graph visualizing all business relationships</td>
+  </tr>
+  <tr>
+    <td>No expert advice on demand</td>
+    <td>Expensive consultants; no 24/7 advisory</td>
+    <td>AI Copilot powered by Google Gemini for real-time advice</td>
+  </tr>
+  <tr>
+    <td>Poor reporting & export</td>
+    <td>No structured business reports for stakeholders</td>
+    <td>PDF, CSV, and Excel export with professional formatting</td>
+  </tr>
+</table>
+
+<h2>1.3 Target Audience</h2>
+<ul>
+  <li><strong>SME Owners & Founders</strong> — Need high-level strategic overview and decision simulations</li>
+  <li><strong>Operations Managers</strong> — Need inventory, supplier, and fulfillment insights</li>
+  <li><strong>Finance Teams</strong> — Need scenario comparisons, ROI analysis, and exportable reports</li>
+  <li><strong>Business Analysts</strong> — Need analytics dashboards, knowledge graphs, and data exports</li>
+</ul>
+
+<!-- ============================================================ SECTION 2: OVERVIEW -->
+<h1 id="overview">2. Project Overview & Objectives</h1>
+
+<h2>2.1 What is DecisionPilot AI?</h2>
+<p>DecisionPilot AI is a <strong>full-stack, AI-powered business decision intelligence platform</strong> built for SMEs. It transforms raw business variables — revenue, operational costs, inventory levels, supplier reliability, and market conversion rates — into actionable, quantified strategic intelligence using Monte Carlo simulation, Google Gemini AI, and interactive data visualization.</p>
+
+<div class="info-box">
+  <strong>Core Mission:</strong> Enable any SME operator to make data-backed decisions in minutes — not weeks — without needing a data science team or management consultant.
+</div>
+
+<h2>2.2 Key Objectives</h2>
+<ol>
+  <li>Provide <strong>quantified scenario simulation</strong> with statistically validated outcomes using Monte Carlo modeling</li>
+  <li>Deliver <strong>AI-generated consulting advice</strong> (via Google Gemini 1.5 Flash) for each simulated decision option</li>
+  <li>Visualize <strong>business entity relationships</strong> through an interactive Knowledge Graph</li>
+  <li>Monitor <strong>inventory health and supplier reliability</strong> in real time</li>
+  <li>Enable <strong>professional report generation</strong> in PDF, CSV, and Excel formats</li>
+  <li>Maintain <strong>enterprise-grade security</strong> via Supabase JWT authentication with role-based access control</li>
+  <li>Deploy as a <strong>cloud-native, fully managed SaaS</strong> application</li>
+</ol>
+
+<h2>2.3 Project Scope</h2>
+<p>The platform covers the following high-level operational domains for SMEs:</p>
+<ul>
+  <li>Strategic Decision Intelligence (Simulate → Compare → Act)</li>
+  <li>Financial Analytics (Revenue, Cost, Profit, ROI tracking)</li>
+  <li>Supply Chain Intelligence (Inventory + Supplier management)</li>
+  <li>Business Knowledge Mapping (Knowledge Graph)</li>
+  <li>AI Advisory (Copilot chat assistant)</li>
+  <li>Compliance Reporting (Exportable business reports)</li>
+</ul>
+
+<!-- ============================================================ SECTION 3: ARCHITECTURE -->
+<h1 id="architecture" class="page-break">3. System Architecture</h1>
+
+<h2>3.1 High-Level Architecture</h2>
+<p>DecisionPilot AI follows a modern <strong>3-tier architecture</strong> with clear separation between the presentation layer, business logic layer, and data layer.</p>
+
+<div class="arch-box">
+  <div class="layer-title">🖥️ PRESENTATION LAYER — React + TypeScript (Vercel)</div>
+  <p>Single Page Application built with React 18, TypeScript, Vite, TailwindCSS, Framer Motion. Handles all UI rendering, routing, state management, and user interactions. Deployed on Vercel with automatic CI/CD from GitHub.</p>
+</div>
+
+<div class="arch-box">
+  <div class="layer-title">⚙️ BUSINESS LOGIC LAYER — FastAPI + Python (Render)</div>
+  <p>RESTful API server built with FastAPI. Handles Monte Carlo simulation (NumPy), Gemini AI integration, JWT verification, rate limiting, and all business domain logic. Deployed on Render.com with auto-deploy from GitHub.</p>
+</div>
+
+<div class="arch-box">
+  <div class="layer-title">🗄️ DATA LAYER — Supabase (PostgreSQL)</div>
+  <p>Managed PostgreSQL database provided by Supabase. Handles user authentication, session management, JWT token issuance, and persistent workspace data storage. Also provides Row Level Security for multi-tenant isolation.</p>
+</div>
+
+<div class="arch-box">
+  <div class="layer-title">🤖 AI LAYER — Google Gemini 1.5 Flash</div>
+  <p>External AI API called by the FastAPI backend. Generates structured JSON consulting reports including supporting factors, risks, opportunities, reasoning, and alternative strategies for each simulated decision option.</p>
+</div>
+
+<h2>3.2 Request Flow Diagram</h2>
+<table>
+  <tr><th>Step</th><th>Component</th><th>Action</th></tr>
+  <tr><td>1</td><td>Browser (Vercel)</td><td>User logs in → Supabase returns JWT access token</td></tr>
+  <tr><td>2</td><td>React App</td><td>Stores JWT in Zustand authStore; attaches to all API requests as <code>Authorization: Bearer {token}</code></td></tr>
+  <tr><td>3</td><td>FastAPI (Render)</td><td>HTTPBearer middleware validates JWT signature against Supabase JWT secret</td></tr>
+  <tr><td>4</td><td>FastAPI Services</td><td>Business logic executes: SimulationEngine (NumPy) + GeminiService (httpx → Google API)</td></tr>
+  <tr><td>5</td><td>Response</td><td>JSON response with CORS headers returned to React app</td></tr>
+  <tr><td>6</td><td>React UI</td><td>TanStack Query caches and renders the response in interactive charts/tables</td></tr>
+</table>
+
+<!-- ============================================================ SECTION 4: TECH STACK -->
+<h1 id="tech" class="page-break">4. Technology Stack</h1>
+
+<h2>4.1 Frontend Technologies</h2>
+<table>
+  <tr><th>Technology</th><th>Version</th><th>Purpose</th></tr>
+  <tr><td><strong>React</strong></td><td>18.3.1</td><td>Core UI framework with concurrent rendering</td></tr>
+  <tr><td><strong>TypeScript</strong></td><td>5.2.2</td><td>Type safety across all components, services, and stores</td></tr>
+  <tr><td><strong>Vite</strong></td><td>5.3.1</td><td>Ultra-fast build tool with HMR and code splitting</td></tr>
+  <tr><td><strong>React Router DOM</strong></td><td>6.23.1</td><td>Client-side routing with lazy-loaded pages and protected routes</td></tr>
+  <tr><td><strong>TailwindCSS</strong></td><td>3.4.4</td><td>Utility-first CSS with custom design tokens and dark mode</td></tr>
+  <tr><td><strong>Framer Motion</strong></td><td>11.2.10</td><td>Page transitions, micro-animations, and gesture-based interactions</td></tr>
+  <tr><td><strong>TanStack React Query</strong></td><td>5.45.0</td><td>Server state management, caching, and background refetching</td></tr>
+  <tr><td><strong>Zustand</strong></td><td>4.5.2</td><td>Lightweight client state management (auth, decisions, theme)</td></tr>
+  <tr><td><strong>Recharts</strong></td><td>3.9.2</td><td>Responsive analytics charts (line, bar, area, radar)</td></tr>
+  <tr><td><strong>ReactFlow</strong></td><td>11.11.4</td><td>Interactive Knowledge Graph node/edge visualization</td></tr>
+  <tr><td><strong>Radix UI</strong></td><td>Various</td><td>Accessible, unstyled UI primitives (dialogs, dropdowns, tooltips)</td></tr>
+  <tr><td><strong>Lucide React</strong></td><td>0.395.0</td><td>Consistent icon library (600+ SVG icons)</td></tr>
+  <tr><td><strong>Supabase JS</strong></td><td>2.43.4</td><td>Auth SDK for login/signup/session management</td></tr>
+  <tr><td><strong>Three.js</strong></td><td>0.185.1</td><td>3D ambient background effects on landing page</td></tr>
+  <tr><td><strong>clsx / tailwind-merge</strong></td><td>Latest</td><td>Dynamic class name composition</td></tr>
+</table>
+
+<h2>4.2 Backend Technologies</h2>
+<table>
+  <tr><th>Technology</th><th>Version</th><th>Purpose</th></tr>
+  <tr><td><strong>Python</strong></td><td>3.12</td><td>Primary backend language</td></tr>
+  <tr><td><strong>FastAPI</strong></td><td>0.111.0</td><td>High-performance async REST API framework</td></tr>
+  <tr><td><strong>Uvicorn</strong></td><td>0.30.1</td><td>ASGI server for FastAPI with WebSocket support</td></tr>
+  <tr><td><strong>Pydantic v2</strong></td><td>2.7.4</td><td>Data validation and serialization for all API schemas</td></tr>
+  <tr><td><strong>Pydantic Settings</strong></td><td>2.3.3</td><td>Environment variable management and configuration</td></tr>
+  <tr><td><strong>PyJWT</strong></td><td>2.8.0</td><td>Supabase JWT verification (HS256 and RS256 algorithms)</td></tr>
+  <tr><td><strong>NumPy</strong></td><td>≥2.2.0</td><td>Monte Carlo simulation (normal distributions, statistical modeling)</td></tr>
+  <tr><td><strong>Pandas</strong></td><td>≥2.3.0</td><td>Data manipulation and analytics calculations</td></tr>
+  <tr><td><strong>httpx</strong></td><td>Latest</td><td>Async HTTP client for Google Gemini API calls</td></tr>
+  <tr><td><strong>Supabase Python</strong></td><td>2.4.4</td><td>Database operations and Supabase integration</td></tr>
+  <tr><td><strong>Passlib + bcrypt</strong></td><td>1.7.4</td><td>Password hashing utilities</td></tr>
+  <tr><td><strong>Cryptography</strong></td><td>≥42.0.5</td><td>JWKS asymmetric key verification support</td></tr>
+</table>
+
+<h2>4.3 Infrastructure & Services</h2>
+<table>
+  <tr><th>Service</th><th>Provider</th><th>Purpose</th></tr>
+  <tr><td><strong>Frontend Hosting</strong></td><td>Vercel</td><td>Zero-config deployment, CDN, preview URLs per PR</td></tr>
+  <tr><td><strong>Backend Hosting</strong></td><td>Render.com</td><td>Auto-scaling Python service deployment</td></tr>
+  <tr><td><strong>Database & Auth</strong></td><td>Supabase</td><td>PostgreSQL, row-level security, JWT auth, realtime</td></tr>
+  <tr><td><strong>AI Engine</strong></td><td>Google AI (Gemini 1.5 Flash)</td><td>Structured JSON consulting report generation</td></tr>
+  <tr><td><strong>Version Control</strong></td><td>GitHub</td><td>Source control + CI/CD trigger for both Vercel and Render</td></tr>
+</table>
+
+<!-- ============================================================ SECTION 5: MODULES -->
+<h1 id="modules" class="page-break">5. All Modules & Features</h1>
+
+<!-- 5.1 LANDING PAGE -->
+<h2>5.1 Landing Page & Marketing</h2>
+<p><strong>Route:</strong> <code>/</code> &nbsp;|&nbsp; <strong>Access:</strong> Public (unauthenticated)</p>
+
+<h3>Purpose</h3>
+<p>The landing page serves as the primary marketing and conversion page. It presents the product value proposition, key feature highlights, social proof, and directs visitors to sign up or log in.</p>
+
+<h3>Key Features</h3>
+<ul>
+  <li><strong>3D Ambient Background</strong> — Built with Three.js; generates immersive animated orb effects</li>
+  <li><strong>Hero Section</strong> — Product tagline, CTA buttons (Get Started / Log In), animated gradient text</li>
+  <li><strong>Feature Grid</strong> — Cards highlighting Monte Carlo simulation, AI Copilot, Knowledge Graph, Analytics, and Reporting</li>
+  <li><strong>Animated Statistics</strong> — Counter animations for key metrics (decisions simulated, accuracy, etc.)</li>
+  <li><strong>Navigation Header</strong> — Fixed header with smooth scroll, responsive hamburger menu</li>
+  <li><strong>Mobile Responsive</strong> — Fully responsive layout across all breakpoints</li>
+  <li><strong>SEO Optimized</strong> — Proper title tags, meta descriptions, semantic HTML5 structure</li>
+</ul>
+
+<h3>Technology Used</h3>
+<p><span class="badge">React</span> <span class="badge">Three.js</span> <span class="badge">Framer Motion</span> <span class="badge">TailwindCSS</span></p>
+
+<!-- 5.2 AUTHENTICATION -->
+<h2>5.2 Authentication System</h2>
+<p><strong>Routes:</strong> <code>/auth/login</code> &nbsp; <code>/auth/signup</code> &nbsp; <code>/auth/forgot-password</code></p>
+<p><strong>Access:</strong> Public only (authenticated users redirected to dashboard)</p>
+
+<h3>Purpose</h3>
+<p>Enterprise-grade authentication system powered by Supabase Auth. Manages user identity, session lifecycle, and role-based access control throughout the application.</p>
+
+<h3>Key Features</h3>
+<ul>
+  <li><strong>Login Page</strong> — Email + password with "Remember Me" toggle, error handling, and loading states</li>
+  <li><strong>Signup Page</strong> — Full registration with name, email, password + strength indicator, role selection</li>
+  <li><strong>Forgot Password</strong> — Email-based password reset flow via Supabase magic links</li>
+  <li><strong>JWT Session Management</strong> — Access tokens stored in Zustand <code>authStore</code>, auto-injected into all API calls</li>
+  <li><strong>Role-Based Access Control (RBAC)</strong> — Three roles: <code>owner</code>, <code>admin</code>, <code>employee</code></li>
+  <li><strong>Protected Routes</strong> — <code>ProtectedRoute</code> component blocks unauthenticated access and enforces role permissions</li>
+  <li><strong>Public Routes</strong> — <code>PublicRoute</code> prevents authenticated users from accessing auth pages</li>
+  <li><strong>Session Persistence</strong> — Supabase handles token refresh; sessions survive page reloads</li>
+</ul>
+
+<h3>Role Permissions</h3>
+<table>
+  <tr><th>Role</th><th>Dashboard</th><th>Analytics</th><th>Simulate Decision</th><th>Settings</th></tr>
+  <tr><td><strong>Owner</strong></td><td>✅</td><td>✅</td><td>✅</td><td>✅</td></tr>
+  <tr><td><strong>Admin</strong></td><td>✅</td><td>✅</td><td>✅</td><td>✅</td></tr>
+  <tr><td><strong>Employee</strong></td><td>✅</td><td>✅</td><td>❌</td><td>❌</td></tr>
+</table>
+
+<h3>Technology Used</h3>
+<p><span class="badge">Supabase Auth</span> <span class="badge">Zustand authStore</span> <span class="badge">React Router</span> <span class="badge">PyJWT (backend)</span></p>
+
+<!-- 5.3 DASHBOARD -->
+<h2>5.3 Overview Dashboard</h2>
+<p><strong>Route:</strong> <code>/dashboard</code> &nbsp;|&nbsp; <strong>Access:</strong> All authenticated roles</p>
+
+<h3>Purpose</h3>
+<p>The central command center — provides an at-a-glance view of the business health, key performance indicators, recent decisions, and AI-generated alerts.</p>
+
+<h3>Key Features</h3>
+<ul>
+  <li><strong>KPI Metric Cards</strong> — Monthly Revenue, Operating Costs, Profit Margin, Active Decisions; each with trend indicators (▲▼) and period-over-period comparisons</li>
+  <li><strong>Revenue vs Cost Chart</strong> — Area/line chart (Recharts) showing financial trend over the last 6 months</li>
+  <li><strong>Recent Decisions List</strong> — Quick access to last 5 simulated decisions with status badges (Draft / Completed)</li>
+  <li><strong>AI Insights Panel</strong> — AI-generated business alerts and recommendations displayed as notification cards</li>
+  <li><strong>Quick Action Buttons</strong> — One-click navigation to New Decision, Analytics, and Reports</li>
+  <li><strong>Workspace Info</strong> — Active workspace name, role, and last sync timestamp</li>
+</ul>
+
+<h3>Technology Used</h3>
+<p><span class="badge">Recharts</span> <span class="badge">TanStack Query</span> <span class="badge">Framer Motion</span> <span class="badge">FastAPI /business/ endpoint</span></p>
+
+<!-- 5.4 ANALYTICS -->
+<h2>5.4 Analytics Engine</h2>
+<p><strong>Route:</strong> <code>/analytics</code> &nbsp;|&nbsp; <strong>Access:</strong> All authenticated roles</p>
+
+<h3>Purpose</h3>
+<p>Deep financial and operational analytics module for visualizing business performance across multiple dimensions.</p>
+
+<h3>Key Features</h3>
+<ul>
+  <li><strong>Revenue Breakdown Chart</strong> — Bar chart comparing revenue by category/period</li>
+  <li><strong>Cost Structure Analysis</strong> — Pie/donut chart of operational cost distribution</li>
+  <li><strong>Profit Trend Lines</strong> — Multi-line chart tracking profit trajectory over time</li>
+  <li><strong>Conversion Rate Monitoring</strong> — Area chart for customer conversion rate tracking</li>
+  <li><strong>Inventory Health Radar</strong> — Radar/spider chart visualizing multi-dimensional stock health</li>
+  <li><strong>Animated Chart Transitions</strong> — All charts animate on load and data change with Framer Motion</li>
+  <li><strong>Date Range Selector</strong> — Filter analytics by week, month, or quarter</li>
+  <li><strong>Data Table View</strong> — Toggle between chart and raw data table views</li>
+</ul>
+
+<h3>Technology Used</h3>
+<p><span class="badge">Recharts</span> <span class="badge">Framer Motion</span> <span class="badge">TanStack Query</span> <span class="badge">FastAPI /business/ endpoint</span></p>
+
+<!-- 5.5 SIMULATE DECISION -->
+<h2>5.5 Simulate Decision (New Decision)</h2>
+<p><strong>Route:</strong> <code>/decisions/new</code> &nbsp;|&nbsp; <strong>Access:</strong> Owner and Admin roles only</p>
+
+<h3>Purpose</h3>
+<p>The primary intelligence engine. Allows business operators to configure real business parameters, define competing strategy options, run a Monte Carlo simulation, and receive AI-generated consulting advice — all within a single guided workflow.</p>
+
+<h3>Key Features</h3>
+
+<h4>Step 1 — Configure Variables</h4>
+<ul>
+  <li>Input baseline financial variables: <strong>Monthly Revenue, Operating Costs (Opex), Conversion Rate</strong></li>
+  <li>Variables are validated with Pydantic schemas before submission</li>
+  <li>Dynamic form with add/remove variable capability</li>
+</ul>
+
+<h4>Step 2 — Define Options</h4>
+<ul>
+  <li>Create multiple competing strategy options (e.g., "Hire Sales Reps", "Cut Opex by 15%")</li>
+  <li>Each option includes: name, opex modification %, conversion rate lift %</li>
+  <li>Minimum 2 options required for meaningful comparison</li>
+</ul>
+
+<h4>Step 3 — Monte Carlo Simulation (Backend)</h4>
+<ul>
+  <li>Calls <code>POST /api/v1/decisions/{id}/simulate</code></li>
+  <li>Backend <code>SimulationEngine</code> runs <strong>1,000 trials per option</strong> using NumPy normal distributions</li>
+  <li>Simulates revenue, cost, and profit variance across all trials</li>
+  <li>Generates 4-checkpoint trend trajectories (Month 1 to Month 4)</li>
+  <li>Computes ROI for each option: <code>ROI = ((mean_revenue - mean_cost) / mean_cost) × 100</code></li>
+  <li>Performs <strong>Sensitivity Analysis</strong>: identifies which variables drive the most variance</li>
+  <li>Returns a <strong>Confidence Score</strong> (93.5% default) for the simulation run</li>
+</ul>
+
+<h4>Step 4 — Gemini AI Consulting Report</h4>
+<ul>
+  <li>For each simulated option, calls <strong>Google Gemini 1.5 Flash</strong> via async httpx</li>
+  <li>Structured JSON prompt requesting: <code>supportingFactors</code>, <code>reasoning</code>, <code>risks</code>, <code>opportunities</code>, <code>alternativeStrategy</code></li>
+  <li>AI fallback: If Gemini API fails, a high-quality mock consulting report is returned</li>
+  <li>Results stored in backend session memory and returned to frontend</li>
+</ul>
+
+<h3>Technology Used</h3>
+<p><span class="badge">NumPy (Monte Carlo)</span> <span class="badge">Google Gemini 1.5 Flash</span> <span class="badge">FastAPI</span> <span class="badge">Pydantic</span> <span class="badge">Framer Motion (stepper UI)</span></p>
+
+<!-- 5.6 DECISION DETAILS -->
+<h2>5.6 Decision Details & Results</h2>
+<p><strong>Route:</strong> <code>/decisions/:id</code> &nbsp;|&nbsp; <strong>Access:</strong> All authenticated roles</p>
+
+<h3>Purpose</h3>
+<p>Detailed view of a completed simulation. Presents full simulation results, AI consulting reports, ROI rankings, and interactive trend charts for each strategy option.</p>
+
+<h3>Key Features</h3>
+<ul>
+  <li><strong>Executive Summary Card</strong> — Title, confidence score, simulation timestamp, and status badge</li>
+  <li><strong>Option ROI Ranking</strong> — Sorted list of all options by projected ROI with color-coded performance bars</li>
+  <li><strong>Trend Line Charts</strong> — Line chart (Recharts) showing Revenue, Cost, Profit trajectory over 4 months per option</li>
+  <li><strong>AI Consulting Report Panel</strong> — Expandable accordion per option showing: Supporting Factors, Strategic Reasoning, Risk Factors, Opportunities, Alternative Strategy</li>
+  <li><strong>Sensitivity Analysis Section</strong> — Variable impact ratings (High/Medium/Low) with descriptions</li>
+  <li><strong>Best Option Highlight</strong> — Recommended option badge (⭐ highest ROI) prominently displayed</li>
+  <li><strong>Back Navigation</strong> — Returns to decision list or dashboard</li>
+</ul>
+
+<h3>Technology Used</h3>
+<p><span class="badge">Recharts</span> <span class="badge">Radix UI Accordion</span> <span class="badge">TanStack Query</span> <span class="badge">Framer Motion</span></p>
+
+<!-- 5.7 COMPARE SCENARIOS -->
+<h2>5.7 Compare Scenarios</h2>
+<p><strong>Route:</strong> <code>/compare</code> &nbsp;|&nbsp; <strong>Access:</strong> All authenticated roles</p>
+
+<h3>Purpose</h3>
+<p>Side-by-side strategic comparison of up to 5 pre-built SME business strategies. Designed for rapid executive decision-making without needing to configure a full simulation.</p>
+
+<h3>Key Features</h3>
+<ul>
+  <li><strong>5 Pre-Built Strategies:</strong>
+    <ol>
+      <li>Aggressive Expansion — ₹2,80,000 revenue, High risk, 75% ROI</li>
+      <li>Operational Optimization — ₹1,60,000 revenue, Low risk, 88% ROI</li>
+      <li>Inventory Stock-Up Buffer — ₹1,90,000 revenue, Medium risk, 72% ROI</li>
+      <li>Premium Pricing Hike — ₹1,40,000 revenue, Medium risk, 100% ROI</li>
+      <li>Hire Dedicated Sales Reps — ₹3,10,000 revenue, Medium risk, 121% ROI ⭐</li>
+    </ol>
+  </li>
+  <li><strong>Toggle Filter Chips</strong> — Enable/disable strategies from the comparison (minimum 2 required)</li>
+  <li><strong>Best Option Highlight Card</strong> — Green card showing the highest ROI strategy with profit and inventory metrics</li>
+  <li><strong>Worst Option Highlight Card</strong> — Red card showing the highest-risk / lowest-ROI strategy</li>
+  <li><strong>Full Comparison Table</strong> — 7-column table: Strategy Name, Revenue, Costs, Profit, Risk Level, Inventory Safety, AI Recommendation</li>
+  <li><strong>Risk Badges</strong> — Color-coded: Green (Low), Amber (Medium), Red (High)</li>
+  <li><strong>Export PDF Report</strong> — Generates a clean white-background professional HTML report in a new window with auto-print trigger</li>
+</ul>
+
+<h3>PDF Report Contents</h3>
+<ul>
+  <li>DecisionPilot AI branding header with generation date</li>
+  <li>Best and worst strategy highlight cards</li>
+  <li>Complete 7-column comparison table</li>
+  <li>Professional footer with confidentiality notice</li>
+</ul>
+
+<h3>Technology Used</h3>
+<p><span class="badge">React useState</span> <span class="badge">window.open HTML report</span> <span class="badge">TailwindCSS</span></p>
+
+<!-- 5.8 AI COPILOT -->
+<h2>5.8 AI Copilot</h2>
+<p><strong>Route:</strong> <code>/copilot</code> &nbsp;|&nbsp; <strong>Access:</strong> All authenticated roles</p>
+
+<h3>Purpose</h3>
+<p>A real-time AI business advisory chatbot that provides streaming, token-by-token responses for business queries — simulating a premium AI consultant experience.</p>
+
+<h3>Key Features</h3>
+<ul>
+  <li><strong>Chat Interface</strong> — Modern chat UI with user/AI message bubbles, timestamps, and avatars</li>
+  <li><strong>Streaming Responses</strong> — Backend sends word-by-word streaming via <code>StreamingResponse</code> (SSE); frontend renders tokens progressively, simulating LLM token streaming</li>
+  <li><strong>Business Context Awareness</strong> — Responses reference actual workspace parameters (opex, suppliers, inventory)</li>
+  <li><strong>Quick Prompt Suggestions</strong> — Pre-built prompt chips for common business queries</li>
+  <li><strong>Typing Indicator</strong> — Animated dots while AI response is streaming</li>
+  <li><strong>Copy Response</strong> — Click to copy any AI response to clipboard</li>
+  <li><strong>Session History</strong> — Chat history persisted within the session</li>
+  <li><strong>Rate Limited</strong> — Backend rate_limit_check dependency prevents abuse</li>
+</ul>
+
+<h3>Backend Streaming</h3>
+<p>The copilot endpoint (<code>GET /api/v1/copilot/chat?prompt=...</code>) uses FastAPI's <code>StreamingResponse</code> with an async generator that yields words with a 60ms delay, creating a natural token-streaming effect:</p>
+<p><code>yield f"{word} " → await asyncio.sleep(0.06)</code></p>
+
+<h3>Technology Used</h3>
+<p><span class="badge">FastAPI StreamingResponse</span> <span class="badge">asyncio</span> <span class="badge">React fetch Streaming API</span> <span class="badge">Framer Motion</span></p>
+
+<!-- 5.9 KNOWLEDGE GRAPH -->
+<h2>5.9 Knowledge Graph</h2>
+<p><strong>Route:</strong> <code>/graph</code> &nbsp;|&nbsp; <strong>Access:</strong> All authenticated roles</p>
+
+<h3>Purpose</h3>
+<p>Visualizes the complete interconnected business ecosystem — suppliers, inventory, menu items, orders, customers, restaurants, and revenue — as an interactive node-edge graph. Reveals hidden relationships and dependencies in the business supply chain.</p>
+
+<h3>Key Features</h3>
+<ul>
+  <li><strong>Interactive Graph Canvas</strong> — Built with ReactFlow; supports drag, zoom, pan, and node selection</li>
+  <li><strong>Node Types (7 categories):</strong>
+    <ul>
+      <li>🟠 <strong>Supplier</strong> — e.g., Sysco Logistics, GreenValley Farms</li>
+      <li>🟣 <strong>Inventory</strong> — e.g., Fresh Produce, Prime Cold Storage</li>
+      <li>🔵 <strong>Menu Item</strong> — e.g., Dry-Aged Ribeye, Organic Harvest Salad</li>
+      <li>🟡 <strong>Orders</strong> — e.g., Dinner Rush Transactions</li>
+      <li>🟢 <strong>Customers</strong> — e.g., Repeat Residents</li>
+      <li>🔴 <strong>Restaurant</strong> — e.g., Bistro Downtown</li>
+      <li>💚 <strong>Revenue</strong> — e.g., Direct Register Revenue</li>
+    </ul>
+  </li>
+  <li><strong>Labeled Edges</strong> — Relationships between nodes labeled (e.g., "Organic Clean Delivery", "Cash Settlement")</li>
+  <li><strong>Category Filter Chips</strong> — Toggle visibility by entity type</li>
+  <li><strong>Search</strong> — Filter nodes by label name</li>
+  <li><strong>Node Detail Panel</strong> — Click any node to see full details: status, description, performance metrics</li>
+  <li><strong>Data from Backend</strong> — Graph data fetched from <code>GET /api/v1/graph/</code> with JWT auth</li>
+</ul>
+
+<h3>Graph Data Structure</h3>
+<table>
+  <tr><th>Entity</th><th>Connects To</th><th>Relationship</th></tr>
+  <tr><td>Sysco Logistics (Supplier)</td><td>Fresh Produce (Inventory)</td><td>Organic Clean Delivery</td></tr>
+  <tr><td>GreenValley Farms (Supplier)</td><td>Prime Cold Storage (Inventory)</td><td>Cold-chain Logistics</td></tr>
+  <tr><td>Fresh Produce (Inventory)</td><td>Dry-Aged Ribeye (Menu Item)</td><td>Important Box</td></tr>
+  <tr><td>Menu Items</td><td>Dinner Rush (Orders)</td><td>Sales Volume</td></tr>
+  <tr><td>Orders</td><td>Bistro Downtown (Restaurant)</td><td>Fulfillment</td></tr>
+  <tr><td>Restaurant</td><td>Direct Register (Revenue)</td><td>Cash Settlement</td></tr>
+</table>
+
+<h3>Technology Used</h3>
+<p><span class="badge">ReactFlow</span> <span class="badge">FastAPI /graph/ endpoint</span> <span class="badge">TanStack Query</span> <span class="badge">FastAPI CORSMiddleware</span></p>
+
+<!-- 5.10 INVENTORY INTEL -->
+<h2>5.10 Inventory Intel</h2>
+<p><strong>Route:</strong> <code>/inventory</code> &nbsp;|&nbsp; <strong>Access:</strong> All authenticated roles</p>
+
+<h3>Purpose</h3>
+<p>Real-time inventory monitoring and management module. Tracks stock levels, expiry dates, predicted usage, and generates restock recommendations with supplier pricing.</p>
+
+<h3>Key Features</h3>
+<ul>
+  <li><strong>Stock Level Cards</strong> — Visual progress bars showing current stock % with color coding: Green (>60%), Amber (30-60%), Red (&lt;30%)</li>
+  <li><strong>Inventory Items:</strong>
+    <ul>
+      <li>Refined Flour — 28% stock level, 45-day expiry, Restock: Yes → FreshFoods Wholesalers (₹850/bag)</li>
+      <li>Compostable Meal Trays — 14% stock level, 360-day expiry, Restock: Yes → Acme EcoPack (₹12/unit)</li>
+      <li>Cold-Pressed Canola Oil — 82% stock level, 12-day expiry, Restock: No</li>
+    </ul>
+  </li>
+  <li><strong>Restock Action Button</strong> — Calls <code>POST /api/v1/inventory/{item_id}/restock</code> to replenish item to 100% with animated feedback</li>
+  <li><strong>Best Supplier Recommendation</strong> — Each item shows the optimal supplier with unit pricing</li>
+  <li><strong>Predicted Usage Display</strong> — Monthly predicted consumption per item</li>
+  <li><strong>Expiry Alert</strong> — Items with &lt;15 days expiry highlighted with warning indicators</li>
+  <li><strong>Search & Filter</strong> — Filter by category (Raw Materials, Packaging) or alert status</li>
+</ul>
+
+<h3>Technology Used</h3>
+<p><span class="badge">FastAPI /inventory/ endpoint</span> <span class="badge">TanStack Query (mutations)</span> <span class="badge">Framer Motion</span></p>
+
+<!-- 5.11 SUPPLIER INTEL -->
+<h2>5.11 Supplier Intel</h2>
+<p><strong>Route:</strong> <code>/suppliers</code> &nbsp;|&nbsp; <strong>Access:</strong> All authenticated roles</p>
+
+<h3>Purpose</h3>
+<p>Supplier relationship management and performance intelligence module. Tracks reliability scores, pricing, lead times, and certifications across the supplier network.</p>
+
+<h3>Key Features</h3>
+<ul>
+  <li><strong>Supplier Cards</strong> — Individual supplier profiles with: name, type, reliability score (%), pricing tier, lead time, and certifications</li>
+  <li><strong>Reliability Score Meter</strong> — Visual circular progress showing supplier performance percentage</li>
+  <li><strong>Comparison View</strong> — Side-by-side supplier comparison table across key metrics</li>
+  <li><strong>Status Badges</strong> — Partner / Preferred / At Risk / Monitor classifications</li>
+  <li><strong>Contact Information</strong> — Supplier contact details and last order history</li>
+  <li><strong>AI Recommendation</strong> — AI-highlighted best supplier per category</li>
+  <li><strong>Sort & Filter</strong> — Sort by reliability, price, or lead time; filter by status</li>
+</ul>
+
+<h3>Technology Used</h3>
+<p><span class="badge">FastAPI</span> <span class="badge">Recharts (radar chart)</span> <span class="badge">TanStack Query</span> <span class="badge">Framer Motion</span></p>
+
+<!-- 5.12 FULFILLMENT REPORTS -->
+<h2>5.12 Fulfillment Reports Engine</h2>
+<p><strong>Route:</strong> <code>/reports</code> &nbsp;|&nbsp; <strong>Access:</strong> All authenticated roles</p>
+
+<h3>Purpose</h3>
+<p>Business reporting hub for generating, previewing, and exporting structured financial and operational reports across three formats (PDF, CSV, Excel).</p>
+
+<h3>Report Templates</h3>
+<table>
+  <tr><th>Template Name</th><th>Type</th><th>Size</th><th>Contents</th></tr>
+  <tr><td>Core Business Summary</td><td>Business Summary</td><td>1.2 MB</td><td>Monthly Revenue, Opex, Stock Optimization, Risk Profile</td></tr>
+  <tr><td>Weekly Cash Velocity Audit</td><td>Weekly Report</td><td>950 KB</td><td>Week-by-week Revenue, Opex, Stock Alerts</td></tr>
+  <tr><td>Monthly Multi-Scenario Forecast</td><td>Monthly Report</td><td>2.4 MB</td><td>Expansion, Optimization, Staffing scenario P&amp;L</td></tr>
+  <tr><td>AI Consultant Deep Assessment</td><td>AI Summary</td><td>450 KB</td><td>Strategic advice, critical vulnerabilities, timelines</td></tr>
+  <tr><td>Unified Executive Dashboard</td><td>Executive Dashboard</td><td>4.8 MB</td><td>Financials, supply chain performance, AI evaluations</td></tr>
+</table>
+
+<h3>Key Features</h3>
+<ul>
+  <li><strong>Report Catalog Panel</strong> — Left panel with all 5 report templates; click to preview</li>
+  <li><strong>Live Data Preview</strong> — Right panel shows a formatted data table parsed from the report's CSV content</li>
+  <li><strong>Export PDF</strong> — Generates a clean white-background HTML report with: branding header, report type badge, description, data table, footer. Opens in new window with auto-print trigger</li>
+  <li><strong>Export CSV</strong> — Downloads properly formatted CSV with:
+    <ul>
+      <li>UTF-8 BOM (<code>\uFEFF</code>) for correct ₹ symbol rendering in Excel</li>
+      <li>RFC 4180 compliant quoting (values with commas wrapped in double quotes)</li>
+      <li>CRLF line endings</li>
+    </ul>
+  </li>
+  <li><strong>Export Excel</strong> — Downloads genuine SpreadsheetML XML (<code>.xls</code>) with:
+    <ul>
+      <li>Styled header row (indigo background, white bold text)</li>
+      <li>Frozen first row for scrolling</li>
+      <li>Numeric type detection (strips ₹/% → stored as Number type)</li>
+      <li>No "format mismatch" warning when opening in Excel</li>
+    </ul>
+  </li>
+  <li><strong>Loading States</strong> — Export buttons show spinner animation during generation (900ms simulated delay)</li>
+  <li><strong>Supabase Sync Badge</strong> — Shows "Fulfillment reports synced with Supabase datastore"</li>
+</ul>
+
+<h3>Technology Used</h3>
+<p><span class="badge">Blob API</span> <span class="badge">SpreadsheetML XML</span> <span class="badge">UTF-8 BOM</span> <span class="badge">window.open HTML</span> <span class="badge">Framer Motion</span></p>
+
+<!-- 5.13 SETTINGS -->
+<h2>5.13 Settings</h2>
+<p><strong>Route:</strong> <code>/settings</code> &nbsp;|&nbsp; <strong>Access:</strong> Owner and Admin roles only</p>
+
+<h3>Purpose</h3>
+<p>Workspace and profile configuration panel. Allows authorized users to update business profile, notification preferences, and API integrations.</p>
+
+<h3>Key Features</h3>
+<ul>
+  <li><strong>Business Profile</strong> — Update company name, currency (INR ₹), headcount, language</li>
+  <li><strong>Theme Toggle</strong> — Dark/Light mode switcher (persisted via <code>themeStore</code> in Zustand + localStorage)</li>
+  <li><strong>Notification Preferences</strong> — Enable/disable alerts for stock warnings, decision completions, and AI insights</li>
+  <li><strong>API Key Management</strong> — View and update Gemini API key and Supabase credentials</li>
+  <li><strong>Role Display</strong> — Shows current user role; restricted settings hidden for non-admin roles</li>
+  <li><strong>Save with Backend Sync</strong> — Calls <code>PUT /api/v1/business/</code> to persist business profile changes</li>
+</ul>
+
+<h3>Technology Used</h3>
+<p><span class="badge">Zustand themeStore</span> <span class="badge">FastAPI /business/ PUT</span> <span class="badge">TanStack Query</span> <span class="badge">Radix UI Switch</span></p>
+
+<!-- ============================================================ SECTION 6: BACKEND API -->
+<h1 id="backend" class="page-break">6. Backend API Reference</h1>
+
+<h2>6.1 API Base URL</h2>
+<p>Production: <code>https://decisionpilot-ai-y7o5.onrender.com/api/v1</code></p>
+<p>Interactive Docs: <code>https://decisionpilot-ai-y7o5.onrender.com/api/v1/docs</code></p>
+
+<h2>6.2 All Endpoints</h2>
+<table>
+  <tr><th>Method</th><th>Endpoint</th><th>Auth</th><th>Description</th></tr>
+  <tr><td>GET</td><td><code>/health</code></td><td>None</td><td>Health check — returns service status</td></tr>
+  <tr><td colspan="4" style="background:#ede9fe;color:#4f46e5;font-weight:700;">📋 Decisions</td></tr>
+  <tr><td>GET</td><td><code>/decisions/</code></td><td>Bearer JWT</td><td>List all decisions in current session</td></tr>
+  <tr><td>POST</td><td><code>/decisions/</code></td><td>Bearer JWT</td><td>Create new decision with variables and options</td></tr>
+  <tr><td>GET</td><td><code>/decisions/{id}</code></td><td>Bearer JWT</td><td>Get single decision details</td></tr>
+  <tr><td>POST</td><td><code>/decisions/{id}/simulate</code></td><td>Bearer JWT</td><td>Run Monte Carlo + Gemini AI consulting</td></tr>
+  <tr><td colspan="4" style="background:#dcfce7;color:#16a34a;font-weight:700;">📊 Business</td></tr>
+  <tr><td>GET</td><td><code>/business/</code></td><td>Bearer JWT</td><td>Get business profile configuration</td></tr>
+  <tr><td>PUT</td><td><code>/business/</code></td><td>Bearer JWT (admin/owner)</td><td>Update business profile</td></tr>
+  <tr><td colspan="4" style="background:#dbeafe;color:#2563eb;font-weight:700;">🤖 Copilot</td></tr>
+  <tr><td>GET</td><td><code>/copilot/chat?prompt=...</code></td><td>Bearer JWT</td><td>Streaming word-by-word AI business advice</td></tr>
+  <tr><td colspan="4" style="background:#fef9c3;color:#d97706;font-weight:700;">📦 Inventory</td></tr>
+  <tr><td>GET</td><td><code>/inventory/</code></td><td>Bearer JWT</td><td>List all inventory items with stock levels</td></tr>
+  <tr><td>POST</td><td><code>/inventory/{id}/restock</code></td><td>Bearer JWT</td><td>Restock item to 100% capacity</td></tr>
+  <tr><td colspan="4" style="background:#f0fdf4;color:#16a34a;font-weight:700;">🕸️ Knowledge Graph</td></tr>
+  <tr><td>GET</td><td><code>/graph/</code></td><td>Bearer JWT</td><td>Get all graph nodes and edges</td></tr>
+  <tr><td colspan="4" style="background:#faf5ff;color:#7c3aed;font-weight:700;">📄 Reports</td></tr>
+  <tr><td>GET</td><td><code>/reports/</code></td><td>Bearer JWT</td><td>List available report templates</td></tr>
+</table>
+
+<h2>6.3 Request/Response Format</h2>
+<p>All requests must include:</p>
+<ul>
+  <li><code>Authorization: Bearer {supabase_jwt_access_token}</code></li>
+  <li><code>Content-Type: application/json</code></li>
+</ul>
+<p>All responses are JSON with standard HTTP status codes: 200 (OK), 201 (Created), 401 (Unauthorized), 403 (Forbidden), 404 (Not Found), 429 (Rate Limited).</p>
+
+<h2>6.4 Rate Limiting</h2>
+<p>All authenticated endpoints use the <code>rate_limit_check</code> FastAPI dependency which enforces per-user request limits to prevent API abuse.</p>
+
+<!-- ============================================================ SECTION 7: SECURITY -->
+<h1 id="security" class="page-break">7. Security & Authentication</h1>
+
+<h2>7.1 Authentication Flow</h2>
+<ol>
+  <li>User logs in via Supabase Auth (email + password)</li>
+  <li>Supabase validates credentials and issues a signed JWT (HS256 or RS256)</li>
+  <li>React frontend stores the JWT in Zustand <code>authStore</code> (memory) — never in localStorage</li>
+  <li>All API requests include <code>Authorization: Bearer {token}</code> header injected by <code>ApiClient</code></li>
+  <li>FastAPI's <code>HTTPBearer</code> security dependency extracts the token</li>
+  <li><code>get_current_user()</code> verifies the JWT signature using <code>SUPABASE_JWT_SECRET</code> (HS256) or JWKS endpoint (RS256)</li>
+  <li>JWT claims returned as user context to all route handlers</li>
+</ol>
+
+<h2>7.2 CORS Policy</h2>
+<p>FastAPI uses the native <code>CORSMiddleware</code> (pure ASGI) configured with:</p>
+<ul>
+  <li><strong>Explicit origins:</strong> <code>http://localhost:5173</code>, <code>https://decision-pilot-ai-alpha.vercel.app</code></li>
+  <li><strong>Regex pattern:</strong> <code>https://[a-zA-Z0-9][a-zA-Z0-9\-]*\.vercel\.app</code> — covers all Vercel preview deployments</li>
+  <li><strong>Allowed methods:</strong> GET, POST, PUT, DELETE, OPTIONS, PATCH</li>
+  <li><strong>Credentials:</strong> Enabled</li>
+</ul>
+
+<h2>7.3 Role-Based Access Control</h2>
+<table>
+  <tr><th>Role</th><th>Assigned Via</th><th>Privileges</th></tr>
+  <tr><td><code>owner</code></td><td>Supabase user_metadata</td><td>Full access to all features including Settings and Decision simulation</td></tr>
+  <tr><td><code>admin</code></td><td>Supabase user_metadata</td><td>Same as owner; can manage business profile</td></tr>
+  <tr><td><code>employee</code></td><td>Supabase user_metadata</td><td>Read-only access to Dashboard, Analytics, Reports; cannot create decisions or access Settings</td></tr>
+</table>
+
+<h2>7.4 Data Security</h2>
+<ul>
+  <li>All API communication is over <strong>HTTPS</strong> (TLS/SSL)</li>
+  <li>JWT tokens are <strong>short-lived</strong> and auto-refreshed by Supabase SDK</li>
+  <li>Passwords are hashed using <strong>bcrypt</strong> (passlib) — never stored in plaintext</li>
+  <li>Supabase enforces <strong>Row Level Security (RLS)</strong> on all database tables</li>
+  <li>API keys (Gemini, Supabase) stored as environment variables — never in source code</li>
+  <li>Report exports encrypted with <strong>Encryption Enabled</strong> label (Supabase datastore sync)</li>
+</ul>
+
+<!-- ============================================================ SECTION 8: DEPLOYMENT -->
+<h1 id="deployment" class="page-break">8. Deployment Architecture</h1>
+
+<h2>8.1 Frontend Deployment (Vercel)</h2>
+<table>
+  <tr><th>Aspect</th><th>Details</th></tr>
+  <tr><td>Platform</td><td>Vercel</td></tr>
+  <tr><td>Production URL</td><td>https://decision-pilot-ai-alpha.vercel.app</td></tr>
+  <tr><td>Build Command</td><td><code>tsc &amp;&amp; vite build</code></td></tr>
+  <tr><td>Output Directory</td><td><code>dist/</code></td></tr>
+  <tr><td>CI/CD</td><td>Auto-deploy on every push to <code>main</code> branch</td></tr>
+  <tr><td>SPA Routing</td><td><code>vercel.json</code> rewrites all paths to <code>index.html</code></td></tr>
+  <tr><td>Env Variables</td><td><code>VITE_API_URL</code>, <code>VITE_SUPABASE_URL</code>, <code>VITE_SUPABASE_ANON_KEY</code></td></tr>
+  <tr><td>Code Splitting</td><td>All pages lazy-loaded via React.lazy() — optimal initial bundle size</td></tr>
+</table>
+
+<h2>8.2 Backend Deployment (Render)</h2>
+<table>
+  <tr><th>Aspect</th><th>Details</th></tr>
+  <tr><td>Platform</td><td>Render.com (Web Service)</td></tr>
+  <tr><td>Production URL</td><td>https://decisionpilot-ai-y7o5.onrender.com</td></tr>
+  <tr><td>Runtime</td><td>Python 3.12</td></tr>
+  <tr><td>Start Command</td><td><code>uvicorn app.main:app --host 0.0.0.0 --port 8000</code></td></tr>
+  <tr><td>CI/CD</td><td>Auto-deploy on push to GitHub <code>main</code> branch</td></tr>
+  <tr><td>Env Variables</td><td><code>SUPABASE_JWT_SECRET</code>, <code>GEMINI_API_KEY</code>, <code>VITE_SUPABASE_URL</code>, <code>VITE_SUPABASE_ANON_KEY</code>, <code>BACKEND_CORS_ORIGINS</code></td></tr>
+</table>
+
+<h2>8.3 Database (Supabase)</h2>
+<table>
+  <tr><th>Aspect</th><th>Details</th></tr>
+  <tr><td>Provider</td><td>Supabase (managed PostgreSQL)</td></tr>
+  <tr><td>Auth</td><td>Supabase Auth with email/password and JWT tokens</td></tr>
+  <tr><td>Security</td><td>Row Level Security (RLS) enabled on all tables</td></tr>
+  <tr><td>JWT Algorithm</td><td>HS256 with shared secret / RS256 with JWKS endpoint</td></tr>
+</table>
+
+<!-- ============================================================ SECTION 9: DATA FLOW -->
+<h1 id="dataflow" class="page-break">9. Data Flow & Integration</h1>
+
+<h2>9.1 Decision Simulation Data Flow</h2>
+<table>
+  <tr><th>Step</th><th>Layer</th><th>Action</th></tr>
+  <tr><td>1</td><td>Frontend (React)</td><td>User fills DecisionNewPage form (title, variables, options)</td></tr>
+  <tr><td>2</td><td>Frontend (ApiClient)</td><td>POST /decisions/ with JWT header → creates decision record</td></tr>
+  <tr><td>3</td><td>Frontend (React)</td><td>Navigate to DecisionDetailsPage for the new decision ID</td></tr>
+  <tr><td>4</td><td>Frontend (TanStack Query)</td><td>POST /decisions/{id}/simulate → triggers simulation</td></tr>
+  <tr><td>5</td><td>Backend (SimulationEngine)</td><td>Run 1000-trial Monte Carlo per option using NumPy</td></tr>
+  <tr><td>6</td><td>Backend (GeminiService)</td><td>Async call to Google Gemini 1.5 Flash for each option</td></tr>
+  <tr><td>7</td><td>Backend (FastAPI)</td><td>Merge simulation metrics + AI consulting report → return JSON</td></tr>
+  <tr><td>8</td><td>Frontend (Recharts)</td><td>Render trend line charts + AI consulting accordion</td></tr>
+</table>
+
+<h2>9.2 State Management Architecture</h2>
+<table>
+  <tr><th>Store</th><th>Technology</th><th>Manages</th></tr>
+  <tr><td><code>authStore</code></td><td>Zustand</td><td>Supabase session, JWT token, user role, loading state</td></tr>
+  <tr><td><code>decisionStore</code></td><td>Zustand</td><td>Active decision being configured (variables, options, step)</td></tr>
+  <tr><td><code>themeStore</code></td><td>Zustand + localStorage</td><td>Dark/Light mode preference</td></tr>
+  <tr><td>Server State</td><td>TanStack Query</td><td>All API responses (decisions, inventory, graph, business)</td></tr>
+</table>
+
+<!-- ============================================================ SECTION 10: FUTURE -->
+<h1 id="future" class="page-break">10. Future Enhancements</h1>
+
+<h2>10.1 Planned Features</h2>
+<table>
+  <tr><th>Feature</th><th>Priority</th><th>Description</th></tr>
+  <tr><td>Real Database Persistence</td><td><span class="badge badge-red">High</span></td><td>Replace in-memory mock_db with actual Supabase PostgreSQL tables</td></tr>
+  <tr><td>Multi-Workspace Support</td><td><span class="badge badge-red">High</span></td><td>Allow users to create and switch between multiple business workspaces</td></tr>
+  <tr><td>Live Gemini Copilot</td><td><span class="badge badge-amber">Medium</span></td><td>Replace mock streaming with real Gemini API streaming for Copilot</td></tr>
+  <tr><td>Custom Graph Builder</td><td><span class="badge badge-amber">Medium</span></td><td>Allow users to add custom nodes and edges to the Knowledge Graph</td></tr>
+  <tr><td>Email Alerts</td><td><span class="badge badge-amber">Medium</span></td><td>Send email notifications for low stock, completed simulations</td></tr>
+  <tr><td>Mobile App</td><td><span class="badge badge-blue">Low</span></td><td>React Native mobile app for iOS and Android</td></tr>
+  <tr><td>Team Collaboration</td><td><span class="badge badge-blue">Low</span></td><td>Multi-user commenting and annotation on decisions</td></tr>
+  <tr><td>Advanced Analytics</td><td><span class="badge badge-blue">Low</span></td><td>Custom date ranges, downloadable chart images, data exports</td></tr>
+  <tr><td>Webhook Integration</td><td><span class="badge badge-blue">Low</span></td><td>Push simulation results to Slack, Teams, or ERP systems</td></tr>
+</table>
+
+<h2>10.2 Technical Debt Items</h2>
+<ul>
+  <li>Replace all <code>mock_*_db</code> in-memory stores with actual Supabase database queries</li>
+  <li>Add comprehensive unit and integration test suites (pytest for backend, Vitest for frontend)</li>
+  <li>Implement proper database migrations using Alembic</li>
+  <li>Add OpenAPI documentation for all endpoints</li>
+  <li>Implement proper error boundary components in React for production resilience</li>
+</ul>
+
+<!-- ============================================================ SUMMARY TABLE -->
+<h1 class="page-break">Summary: Complete Feature Matrix</h1>
+<table>
+  <tr><th>Module</th><th>Route</th><th>Auth</th><th>AI Powered</th><th>Export</th></tr>
+  <tr><td>Landing Page</td><td>/</td><td>Public</td><td>No</td><td>No</td></tr>
+  <tr><td>Login / Signup</td><td>/auth/*</td><td>Public</td><td>No</td><td>No</td></tr>
+  <tr><td>Overview Dashboard</td><td>/dashboard</td><td>All roles</td><td>Yes (AI Insights)</td><td>No</td></tr>
+  <tr><td>Analytics Engine</td><td>/analytics</td><td>All roles</td><td>No</td><td>No</td></tr>
+  <tr><td>Simulate Decision</td><td>/decisions/new</td><td>Admin/Owner</td><td>Yes (Gemini)</td><td>No</td></tr>
+  <tr><td>Decision Details</td><td>/decisions/:id</td><td>All roles</td><td>Yes (Gemini)</td><td>No</td></tr>
+  <tr><td>Compare Scenarios</td><td>/compare</td><td>All roles</td><td>No</td><td>PDF</td></tr>
+  <tr><td>AI Copilot</td><td>/copilot</td><td>All roles</td><td>Yes (Streaming)</td><td>No</td></tr>
+  <tr><td>Knowledge Graph</td><td>/graph</td><td>All roles</td><td>No</td><td>No</td></tr>
+  <tr><td>Inventory Intel</td><td>/inventory</td><td>All roles</td><td>Yes (Predictions)</td><td>No</td></tr>
+  <tr><td>Supplier Intel</td><td>/suppliers</td><td>All roles</td><td>Yes (Scoring)</td><td>No</td></tr>
+  <tr><td>Fulfillment Reports</td><td>/reports</td><td>All roles</td><td>No</td><td>PDF + CSV + Excel</td></tr>
+  <tr><td>Settings</td><td>/settings</td><td>Admin/Owner</td><td>No</td><td>No</td></tr>
+</table>
+
+<br/><br/>
+<div style="text-align:center;padding:24pt;border-top:2pt solid #4f46e5;color:#6b7280;font-size:10pt;">
+  <p><strong style="color:#4f46e5;">DecisionPilot AI</strong> — AI-Powered Business Decision Intelligence Platform</p>
+  <p>Documentation Version 1.0 &nbsp;|&nbsp; July 2026 &nbsp;|&nbsp; Confidential</p>
+  <p>github.com/RohitRathore188/DecisionPilot-AI</p>
+</div>
+
+</body>
+</html>
