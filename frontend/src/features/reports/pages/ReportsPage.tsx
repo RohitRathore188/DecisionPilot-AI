@@ -95,8 +95,115 @@ export default function ReportsPage() {
 
   const handlePDFExport = () => {
     setExporting("pdf");
+
     setTimeout(() => {
-      window.print();
+      const now = new Date();
+      const dateStr = now.toLocaleDateString("en-IN", { year: "numeric", month: "long", day: "numeric" });
+      const timeStr = now.toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" });
+
+      // Parse CSV content into headers + rows
+      const lines = activeRep.csvContent.split("\n");
+      const headers = lines[0].split(",");
+      const rows = lines.slice(1).map((r) => r.split(","));
+
+      const theadCells = headers.map((h) => `<th style="padding:10px 16px;text-align:left;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:#6b7280;border-bottom:2px solid #e5e7eb;background:#f9fafb">${h}</th>`).join("");
+
+      const tbodyRows = rows.map((row, i) => {
+        const cells = row.map((val) => `<td style="padding:12px 16px;font-size:13px;color:#374151;font-family:monospace;border-bottom:1px solid #f3f4f6">${val}</td>`).join("");
+        return `<tr style="${i % 2 === 0 ? "background:#ffffff" : "background:#fafafa"}">${cells}</tr>`;
+      }).join("");
+
+      const typeColor: Record<string, string> = {
+        "Business Summary": "#6366f1",
+        "Weekly Report":    "#0ea5e9",
+        "Monthly Report":   "#8b5cf6",
+        "AI Summary":       "#f59e0b",
+        "Executive Dashboard": "#10b981",
+      };
+      const badgeColor = typeColor[activeRep.type] || "#6366f1";
+
+      const htmlContent = `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <title>${activeRep.name} — DecisionPilot AI</title>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#fff;color:#111827;padding:48px}
+    @media print{
+      body{padding:24px}
+      .no-print{display:none!important}
+      @page{margin:20mm;size:A4}
+    }
+    .header{display:flex;justify-content:space-between;align-items:flex-start;padding-bottom:24px;border-bottom:2px solid #111827;margin-bottom:36px}
+    .logo{font-size:22px;font-weight:900;letter-spacing:-0.5px}
+    .logo span{color:#6366f1}
+    .meta{text-align:right;font-size:12px;color:#6b7280}
+    .meta strong{display:block;font-size:20px;font-weight:800;color:#111827;margin-bottom:4px}
+    .meta small{display:block;font-size:11px;color:#9ca3af;margin-top:2px}
+    .report-info{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:36px}
+    .info-card{background:#f9fafb;border:1px solid #e5e7eb;border-radius:12px;padding:16px}
+    .info-card .label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:#9ca3af;margin-bottom:6px}
+    .info-card .value{font-size:14px;font-weight:800;color:#111827}
+    .type-badge{display:inline-block;background:${badgeColor}18;color:${badgeColor};border:1px solid ${badgeColor}30;border-radius:999px;padding:3px 12px;font-size:11px;font-weight:700}
+    .description-box{background:#f0f4ff;border-left:4px solid #6366f1;border-radius:0 8px 8px 0;padding:14px 18px;margin-bottom:32px;font-size:13px;color:#374151;line-height:1.6}
+    .section-title{font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:0.5px;color:#6b7280;margin-bottom:14px}
+    table{width:100%;border-collapse:collapse;border-radius:12px;overflow:hidden;border:1px solid #e5e7eb}
+    .footer{margin-top:36px;padding-top:16px;border-top:1px solid #e5e7eb;display:flex;justify-content:space-between;align-items:center}
+    .footer p{font-size:11px;color:#9ca3af}
+    .save-btn{background:#6366f1;color:#fff;border:none;padding:10px 24px;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;margin-bottom:24px}
+  </style>
+</head>
+<body>
+  <div class="no-print" style="margin-bottom:20px">
+    <button class="save-btn" onclick="window.print()">⬇ Save as PDF</button>
+  </div>
+
+  <div class="header">
+    <div class="logo">Decision<span>Pilot</span> AI</div>
+    <div class="meta">
+      <strong>${activeRep.name}</strong>
+      Generated on ${dateStr} at ${timeStr}
+      <small>Workspace: Demo &nbsp;|&nbsp; Size: ${activeRep.size}</small>
+    </div>
+  </div>
+
+  <div class="report-info">
+    <div class="info-card">
+      <div class="label">Report Type</div>
+      <div class="value"><span class="type-badge">${activeRep.type}</span></div>
+    </div>
+    <div class="info-card">
+      <div class="label">Last Generated</div>
+      <div class="value">${activeRep.lastGenerated}</div>
+    </div>
+    <div class="info-card">
+      <div class="label">File Size</div>
+      <div class="value">${activeRep.size}</div>
+    </div>
+  </div>
+
+  <div class="description-box">${activeRep.description}</div>
+
+  <div class="section-title">Report Data</div>
+  <table>
+    <thead><tr>${theadCells}</tr></thead>
+    <tbody>${tbodyRows}</tbody>
+  </table>
+
+  <div class="footer">
+    <p>DecisionPilot AI — Confidential Business Report &nbsp;|&nbsp; Encryption Enabled</p>
+    <p>Generated ${dateStr} at ${timeStr} &nbsp;|&nbsp; AI-Powered Decision Intelligence</p>
+  </div>
+</body>
+</html>`;
+
+      const printWindow = window.open("", "_blank", "width=1000,height=800");
+      if (!printWindow) { setExporting(null); return; }
+      printWindow.document.write(htmlContent);
+      printWindow.document.close();
+      printWindow.focus();
+      printWindow.onload = () => printWindow.print();
       setExporting(null);
     }, 500);
   };
