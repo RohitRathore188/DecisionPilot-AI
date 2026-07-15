@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useDecisionStore, Decision } from "@/store/decisionStore";
+import { useAuthStore } from "@/store/authStore";
 import { 
   Plus, 
   BarChart3, 
@@ -12,7 +13,13 @@ import {
   CheckCircle2, 
   Package, 
   Lightbulb, 
-  Bell 
+  Bell,
+  Cpu,
+  Database,
+  Shield,
+  Terminal,
+  HardDrive,
+  Users
 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
@@ -20,9 +27,11 @@ import { motion, AnimatePresence } from "framer-motion";
 
 export default function DashboardPage() {
   const decisions = useDecisionStore((state) => state.decisions);
+  const role = useAuthStore((state) => state.role);
 
   // States to animate values on load (Futuristic loading states)
   const [chartLoading, setChartLoading] = useState(true);
+
   const [healthScore, setHealthScore] = useState(0);
 
   useEffect(() => {
@@ -72,6 +81,215 @@ export default function DashboardPage() {
     hidden: { opacity: 0, y: 15 },
     show: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 350, damping: 25 } },
   };
+
+  if (role === "admin") {
+    return (
+      <motion.div
+        variants={containerVariants}
+        initial="hidden"
+        animate="show"
+        className="space-y-8 select-none"
+      >
+        {/* Title Header */}
+        <motion.div 
+          variants={itemVariants}
+          className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4"
+        >
+          <div>
+            <h1 className="text-3xl font-extrabold tracking-tight text-gradient">
+              Admin Control Center
+            </h1>
+            <p className="text-muted-foreground text-xs font-semibold mt-0.5">
+              Global system diagnostics, user sessions, calculation queue, and API usage.
+            </p>
+          </div>
+          <div className="flex items-center gap-3">
+            <span className="flex h-2.5 w-2.5 rounded-full bg-green-500 animate-ping" />
+            <span className="text-[10px] uppercase font-bold text-muted-foreground tracking-wider">System Operational</span>
+          </div>
+        </motion.div>
+
+        {/* ── System Diagnostics Row ── */}
+        <motion.div variants={itemVariants} className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+          {[
+            { label: "System Latency", value: "12 ms", desc: "FastAPI endpoints response", icon: Cpu, color: "text-blue-400" },
+            { label: "API Rate Limits", value: "99.8%", desc: "Capacity buffer healthy", icon: Shield, color: "text-green-400" },
+            { label: "FastAPI Task Queue", value: "0 active", desc: "Monte Carlo engine idle", icon: Terminal, color: "text-amber-400" },
+            { label: "DB Connections", value: "4 / 20", desc: "Supabase pools active", icon: Database, color: "text-purple-400" }
+          ].map((diag) => {
+            const Icon = diag.icon;
+            return (
+              <div key={diag.label} className="apple-glass border-white/5 rounded-2xl p-4 flex items-center gap-3">
+                <div className="h-9 w-9 rounded-xl bg-white/5 flex items-center justify-center shrink-0">
+                  <Icon className={`h-4.5 w-4.5 ${diag.color}`} />
+                </div>
+                <div>
+                  <div className="text-[9px] font-bold text-muted-foreground uppercase tracking-wider">{diag.label}</div>
+                  <div className="text-lg font-extrabold text-white mt-0.5">{diag.value}</div>
+                  <div className="text-[8px] text-muted-foreground font-semibold">{diag.desc}</div>
+                </div>
+              </div>
+            );
+          })}
+        </motion.div>
+
+        {/* ── Admin Grid ── */}
+        <div className="grid gap-6 lg:grid-cols-12 items-start">
+          
+          {/* User Registry & Roles (7 Cols) */}
+          <motion.div variants={itemVariants} className="lg:col-span-7">
+            <Card className="apple-glass-card border-white/5 overflow-hidden">
+              <div className="px-5 py-4 border-b border-white/5 flex items-center justify-between">
+                <div>
+                  <h3 className="text-xs font-bold uppercase tracking-wider text-white">User Registry & Workspace Roles</h3>
+                  <p className="text-[9px] text-muted-foreground mt-0.5 font-semibold">Active accounts in current organization session</p>
+                </div>
+                <span className="text-[9px] bg-primary/10 text-primary border border-primary/20 px-2 py-0.5 rounded-full font-bold">3 Users</span>
+              </div>
+              <div className="divide-y divide-white/5">
+                {[
+                  { email: "owner@decisionpilot.ai", role: "Business Owner", active: "active", icon: Users, badge: "bg-blue-500/10 text-blue-400 border-blue-500/20" },
+                  { email: "employee@decisionpilot.ai", role: "Employee", active: "active", icon: Users, badge: "bg-purple-500/10 text-purple-400 border-purple-500/20" },
+                  { email: "admin@decisionpilot.ai", role: "System Admin", active: "active", icon: Shield, badge: "bg-green-500/10 text-green-400 border-green-500/20" }
+                ].map((u) => {
+                  const Icon = u.icon;
+                  return (
+                    <div key={u.email} className="flex items-center justify-between px-5 py-4 hover:bg-white/[0.01]">
+                      <div className="flex items-center gap-3 min-w-0">
+                        <div className="h-8 w-8 rounded-lg bg-white/5 flex items-center justify-center shrink-0">
+                          <Icon className="h-4 w-4 text-muted-foreground" />
+                        </div>
+                        <div className="min-w-0">
+                          <p className="text-xs font-bold text-white truncate">{u.email}</p>
+                          <p className="text-[9px] text-muted-foreground font-semibold mt-0.5">{u.role}</p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-3 shrink-0">
+                        <span className={`inline-flex items-center rounded-full border px-2 py-0.5 text-[8px] font-bold ${u.badge}`}>
+                          {u.role.split(" ").pop()}
+                        </span>
+                        <span className="h-1.5 w-1.5 rounded-full bg-green-400" />
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </Card>
+          </motion.div>
+
+          {/* FastAPI Monte Carlo Queue (5 Cols) */}
+          <motion.div variants={itemVariants} className="lg:col-span-5">
+            <Card className="apple-glass-card border-white/5 p-6 space-y-4">
+              <div className="flex items-center justify-between border-b border-white/5 pb-3">
+                <div className="flex items-center gap-2">
+                  <Terminal className="h-4.5 w-4.5 text-primary" />
+                  <span className="text-xs font-bold text-white uppercase tracking-wider">FastAPI Sim Queue</span>
+                </div>
+                <span className="text-[8px] font-bold uppercase tracking-wider text-muted-foreground">Normal Load</span>
+              </div>
+              <div className="space-y-3">
+                <div className="p-3 rounded-xl bg-white/[0.02] border border-white/5 space-y-1.5">
+                  <div className="flex justify-between text-[10px] font-bold">
+                    <span className="text-white">Active Workers</span>
+                    <span className="text-green-400 font-mono">2 / 2 threads operational</span>
+                  </div>
+                  <div className="h-1 rounded-full bg-white/10 overflow-hidden">
+                    <div className="h-full bg-primary rounded-full w-full" />
+                  </div>
+                </div>
+                <div className="p-3 rounded-xl bg-white/[0.02] border border-white/5 space-y-1">
+                  <span className="text-[8px] text-muted-foreground uppercase font-bold block">Calculation Logs</span>
+                  <div className="font-mono text-[9px] text-muted-foreground space-y-1 leading-relaxed mt-1">
+                    <p className="text-green-400">INFO: [Queue] MC Simulation Task started</p>
+                    <p>INFO: [FastAPI] 1000 trials resolved in 1.48s</p>
+                    <p className="text-green-400">INFO: [Queue] Completed task: MC-9023</p>
+                  </div>
+                </div>
+              </div>
+            </Card>
+          </motion.div>
+
+        </div>
+
+        {/* ── Billing & SME Licenses (12 Cols) ── */}
+        <motion.div variants={itemVariants}>
+          <Card className="apple-glass-card border-white/5 p-6 space-y-6">
+            <div className="flex items-center justify-between border-b border-white/5 pb-4">
+              <div>
+                <h3 className="text-xs font-bold uppercase tracking-wider text-white">SME Licenses & Billing Health</h3>
+                <p className="text-[9px] text-muted-foreground mt-0.5 font-semibold">Subscription bands and billing MRR tracking</p>
+              </div>
+              <div className="flex items-center gap-1.5 text-xs font-bold text-green-400 font-mono">
+                <span className="h-2 w-2 rounded-full bg-green-400 animate-pulse" />
+                <span>₹178,000 MRR</span>
+              </div>
+            </div>
+            <div className="grid gap-4 sm:grid-cols-3">
+              {[
+                { plan: "Free Sandbox", count: "128 licenses", mrr: "₹0", icon: Users, color: "text-blue-400" },
+                { plan: "Startup Pro", count: "24 licenses", mrr: "₹143,976", icon: HardDrive, color: "text-purple-400" },
+                { plan: "Enterprise", count: "1 custom", mrr: "₹34,024", icon: Shield, color: "text-green-400" }
+              ].map((sub) => {
+                const Icon = sub.icon;
+                return (
+                  <div key={sub.plan} className="p-4.5 rounded-2xl border border-white/5 bg-white/[0.01] flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="h-8.5 w-8.5 rounded-xl bg-white/5 flex items-center justify-center">
+                        <Icon className={`h-4.5 w-4.5 ${sub.color}`} />
+                      </div>
+                      <div>
+                        <h4 className="text-xs font-bold text-white">{sub.plan}</h4>
+                        <p className="text-[9px] text-muted-foreground mt-0.5 font-semibold">{sub.count}</p>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <span className="text-sm font-black text-white font-mono">{sub.mrr}</span>
+                      <span className="text-[8px] text-muted-foreground block font-bold uppercase mt-0.5">MRR contribution</span>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </Card>
+        </motion.div>
+
+        {/* ── AI Token Usage ── */}
+        <motion.div variants={itemVariants}>
+          <Card className="apple-glass-card border-white/5 p-6 space-y-4">
+            <div className="flex items-center justify-between border-b border-white/5 pb-3">
+              <div className="flex items-center gap-2">
+                <Sparkles className="h-4.5 w-4.5 text-primary" />
+                <span className="text-xs font-bold text-white uppercase tracking-wider">Gemini AI Token Costs</span>
+              </div>
+              <span className="text-[8px] font-bold uppercase tracking-wider text-muted-foreground">Usage Period: July</span>
+            </div>
+            <div className="grid gap-4 sm:grid-cols-2">
+              <div className="p-4 rounded-xl bg-white/[0.02] border border-white/5 flex justify-between items-center">
+                <div>
+                  <span className="text-[10px] text-muted-foreground font-bold uppercase">Flash Model Input</span>
+                  <span className="text-lg font-extrabold text-white mt-1 block font-mono">1,489,200 tokens</span>
+                </div>
+                <div className="text-right">
+                  <span className="text-[10px] text-muted-foreground font-bold uppercase">Cost</span>
+                  <span className="text-base font-extrabold text-green-400 mt-1 block font-mono">₹112.44</span>
+                </div>
+              </div>
+              <div className="p-4 rounded-xl bg-white/[0.02] border border-white/5 flex justify-between items-center">
+                <div>
+                  <span className="text-[10px] text-muted-foreground font-bold uppercase">Flash Model Output</span>
+                  <span className="text-lg font-extrabold text-white mt-1 block font-mono">684,500 tokens</span>
+                </div>
+                <div className="text-right">
+                  <span className="text-[10px] text-muted-foreground font-bold uppercase">Cost</span>
+                  <span className="text-base font-extrabold text-green-400 mt-1 block font-mono font-mono">₹156.12</span>
+                </div>
+              </div>
+            </div>
+          </Card>
+        </motion.div>
+      </motion.div>
+    );
+  }
 
   return (
     <motion.div
