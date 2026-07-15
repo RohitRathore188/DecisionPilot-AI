@@ -64,7 +64,21 @@ export default function SignupPage() {
         setSession(data.session);
         navigate("/dashboard");
       } else {
-        alert("Please check your email for confirmation link.");
+        // Attempt to auto-login immediately using the credentials
+        try {
+          const { data: logInData } = await supabase.auth.signInWithPassword({
+            email,
+            password,
+          });
+          if (logInData?.session) {
+            setSession(logInData.session);
+            navigate("/dashboard");
+            return;
+          }
+        } catch {
+          // Ignore and fallback
+        }
+        alert("Account created! Please check your email for the confirmation link to complete sign up.");
         navigate("/auth/login");
       }
     } catch (err: any) {
