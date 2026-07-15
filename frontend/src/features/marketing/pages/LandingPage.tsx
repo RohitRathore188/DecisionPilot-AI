@@ -17,7 +17,7 @@ import {
   Zap,
   Users
 } from "lucide-react";
-import { Button } from "@/components/ui/Button";
+
 
 export default function LandingPage() {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
