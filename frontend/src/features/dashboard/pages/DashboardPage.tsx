@@ -31,8 +31,92 @@ export default function DashboardPage() {
 
   // States to animate values on load (Futuristic loading states)
   const [chartLoading, setChartLoading] = useState(true);
-
   const [healthScore, setHealthScore] = useState(0);
+
+  // ── Admin Control Panel Interactivity States ──
+  const [adminUsers, setAdminUsers] = useState([
+    { id: "u1", email: "owner@decisionpilot.ai", role: "owner", icon: Users, badge: "bg-blue-500/10 text-blue-400 border-blue-500/20" },
+    { id: "u2", email: "employee@decisionpilot.ai", role: "employee", icon: Users, badge: "bg-purple-500/10 text-purple-400 border-purple-500/20" },
+    { id: "u3", email: "admin@decisionpilot.ai", role: "admin", icon: Shield, badge: "bg-green-500/10 text-green-400 border-green-500/20" }
+  ]);
+
+  const [consoleLogs, setConsoleLogs] = useState([
+    { id: 1, text: "INFO: [Queue] MC Simulation Task started", color: "text-green-400" },
+    { id: 2, text: "INFO: [FastAPI] 1000 trials resolved in 1.48s", color: "text-white" },
+    { id: 3, text: "INFO: [Queue] Completed task: MC-9023", color: "text-green-400" }
+  ]);
+
+  const [latency, setLatency] = useState(12);
+  const [dbConnections, setDbConnections] = useState(4);
+  const [mrrMultiplier, setMrrMultiplier] = useState(1.0);
+
+  // Global Decisions list managed by admin
+  const [adminDecisions, setAdminDecisions] = useState([
+    { id: "dec-1", title: "Scale Q3 Marketing Spend", creator: "owner@decisionpilot.ai", status: "completed", date: "Jul 12" },
+    { id: "dec-2", title: "Switch to Supplier B (Mumbai)", creator: "owner@decisionpilot.ai", status: "completed", date: "Jul 14" },
+    { id: "dec-3", title: "Increase Buffer Stocks 15%", creator: "employee@decisionpilot.ai", status: "failed", date: "Jul 15" }
+  ]);
+
+  // Global Ingestion streams managed by admin
+  const [adminDataStreams, setAdminDataStreams] = useState([
+    { id: "stream-1", name: "q1_dine_in_sales.csv", uploader: "admin@decisionpilot.ai", size: "2.1 MB", date: "41 min ago" },
+    { id: "stream-2", name: "inventory_safety_margins.xlsx", uploader: "owner@decisionpilot.ai", size: "480 KB", date: "4 hr ago" }
+  ]);
+
+  // Monte Carlo Simulation Engine Controls
+  const [mcTrials, setMcTrials] = useState(1000);
+  const [mcConfidence, setMcConfidence] = useState(95);
+  const [mcSpeed, setMcSpeed] = useState<"fast" | "deep">("fast");
+
+  const deleteAdminDecision = (id: string) => {
+    setAdminDecisions(prev => prev.filter(d => d.id !== id));
+    setConsoleLogs(prev => [
+      ...prev,
+      { id: Date.now(), text: `WARN: [DB] Admin purged decision scenario ${id}`, color: "text-red-400" }
+    ]);
+  };
+
+  const deleteDataStream = (id: string) => {
+    setAdminDataStreams(prev => prev.filter(s => s.id !== id));
+    setConsoleLogs(prev => [
+      ...prev,
+      { id: Date.now(), text: `WARN: [Supabase] Admin removed data stream ${id} from storage`, color: "text-red-400" }
+    ]);
+  };
+
+  const handleRoleChange = (id: string, newRole: string) => {
+    const badgeMap: Record<string, string> = {
+      owner: "bg-blue-500/10 text-blue-400 border-blue-500/20",
+      employee: "bg-purple-500/10 text-purple-400 border-purple-500/20",
+      admin: "bg-green-500/10 text-green-400 border-green-500/20"
+    };
+    setAdminUsers((prev) =>
+      prev.map((u) =>
+        u.id === id
+          ? {
+              ...u,
+              role: newRole,
+              badge: badgeMap[newRole] || "bg-secondary text-muted-foreground",
+              icon: newRole === "admin" ? Shield : Users
+            }
+          : u
+      )
+    );
+  };
+
+  const runSimPing = () => {
+    const taskId = `MC-${Math.floor(1000 + Math.random() * 9000)}`;
+    setConsoleLogs((prev) => [
+      ...prev,
+      { id: Date.now(), text: `INFO: [Queue] Ping task ${taskId} initiated...`, color: "text-amber-400" },
+      { id: Date.now() + 1, text: `INFO: [FastAPI] Resolved mock run in ${Math.round(15 + Math.random() * 45)}ms`, color: "text-white" },
+      { id: Date.now() + 2, text: `INFO: [Queue] Completed task: ${taskId}`, color: "text-green-400" }
+    ]);
+    setLatency((prev) => Math.min(150, prev + 25));
+    setTimeout(() => setLatency(12), 1200);
+  };
+
+  const clearConsole = () => setConsoleLogs([]);
 
   useEffect(() => {
     // Simulate futuristic loading curves for charts
@@ -100,26 +184,26 @@ export default function DashboardPage() {
               Admin Control Center
             </h1>
             <p className="text-muted-foreground text-xs font-semibold mt-0.5">
-              Global system diagnostics, user sessions, calculation queue, and API usage.
+              Interactive system diagnostics, role overrides, simulation logs, and billing tests.
             </p>
           </div>
           <div className="flex items-center gap-3">
             <span className="flex h-2.5 w-2.5 rounded-full bg-green-500 animate-ping" />
-            <span className="text-[10px] uppercase font-bold text-muted-foreground tracking-wider">System Operational</span>
+            <span className="text-[10px] uppercase font-bold text-muted-foreground tracking-wider">System Active</span>
           </div>
         </motion.div>
 
         {/* ── System Diagnostics Row ── */}
         <motion.div variants={itemVariants} className="grid grid-cols-2 lg:grid-cols-4 gap-4">
           {[
-            { label: "System Latency", value: "12 ms", desc: "FastAPI endpoints response", icon: Cpu, color: "text-blue-400" },
+            { label: "System Latency", value: `${latency} ms`, desc: "Live API response spike", icon: Cpu, color: latency > 30 ? "text-amber-400" : "text-blue-400" },
             { label: "API Rate Limits", value: "99.8%", desc: "Capacity buffer healthy", icon: Shield, color: "text-green-400" },
-            { label: "FastAPI Task Queue", value: "0 active", desc: "Monte Carlo engine idle", icon: Terminal, color: "text-amber-400" },
-            { label: "DB Connections", value: "4 / 20", desc: "Supabase pools active", icon: Database, color: "text-purple-400" }
+            { label: "FastAPI Task Queue", value: latency > 30 ? "1 active" : "0 active", desc: "Monte Carlo engine active", icon: Terminal, color: latency > 30 ? "text-amber-400 animate-pulse" : "text-amber-400" },
+            { label: "DB Connections", value: `${dbConnections} / 20`, desc: "Live active pools count", icon: Database, color: "text-purple-400" }
           ].map((diag) => {
             const Icon = diag.icon;
             return (
-              <div key={diag.label} className="apple-glass border-white/5 rounded-2xl p-4 flex items-center gap-3">
+              <div key={diag.label} className="apple-glass border-white/5 rounded-2xl p-4 flex items-center gap-3 transition-colors duration-300">
                 <div className="h-9 w-9 rounded-xl bg-white/5 flex items-center justify-center shrink-0">
                   <Icon className={`h-4.5 w-4.5 ${diag.color}`} />
                 </div>
@@ -133,7 +217,7 @@ export default function DashboardPage() {
           })}
         </motion.div>
 
-        {/* ── Admin Grid ── */}
+        {/* ── Admin Grid: User Registry & Sim Queue ── */}
         <div className="grid gap-6 lg:grid-cols-12 items-start">
           
           {/* User Registry & Roles (7 Cols) */}
@@ -141,17 +225,15 @@ export default function DashboardPage() {
             <Card className="apple-glass-card border-white/5 overflow-hidden">
               <div className="px-5 py-4 border-b border-white/5 flex items-center justify-between">
                 <div>
-                  <h3 className="text-xs font-bold uppercase tracking-wider text-white">User Registry & Workspace Roles</h3>
-                  <p className="text-[9px] text-muted-foreground mt-0.5 font-semibold">Active accounts in current organization session</p>
+                  <h3 className="text-xs font-bold uppercase tracking-wider text-white">Interactive User Registry & RBAC</h3>
+                  <p className="text-[9px] text-muted-foreground mt-0.5 font-semibold">Override organization role access permissions dynamically</p>
                 </div>
-                <span className="text-[9px] bg-primary/10 text-primary border border-primary/20 px-2 py-0.5 rounded-full font-bold">3 Users</span>
+                <span className="text-[9px] bg-primary/10 text-primary border border-primary/20 px-2 py-0.5 rounded-full font-bold">
+                  {adminUsers.length} Users Listed
+                </span>
               </div>
               <div className="divide-y divide-white/5">
-                {[
-                  { email: "owner@decisionpilot.ai", role: "Business Owner", active: "active", icon: Users, badge: "bg-blue-500/10 text-blue-400 border-blue-500/20" },
-                  { email: "employee@decisionpilot.ai", role: "Employee", active: "active", icon: Users, badge: "bg-purple-500/10 text-purple-400 border-purple-500/20" },
-                  { email: "admin@decisionpilot.ai", role: "System Admin", active: "active", icon: Shield, badge: "bg-green-500/10 text-green-400 border-green-500/20" }
-                ].map((u) => {
+                {adminUsers.map((u) => {
                   const Icon = u.icon;
                   return (
                     <div key={u.email} className="flex items-center justify-between px-5 py-4 hover:bg-white/[0.01]">
@@ -161,14 +243,22 @@ export default function DashboardPage() {
                         </div>
                         <div className="min-w-0">
                           <p className="text-xs font-bold text-white truncate">{u.email}</p>
-                          <p className="text-[9px] text-muted-foreground font-semibold mt-0.5">{u.role}</p>
+                          <p className="text-[9px] text-muted-foreground font-semibold mt-0.5">Active Session</p>
                         </div>
                       </div>
                       <div className="flex items-center gap-3 shrink-0">
+                        <select
+                          className="bg-secondary text-white text-[10px] font-bold border border-white/10 rounded-xl px-2.5 py-1 outline-none cursor-pointer focus:border-primary transition-all"
+                          value={u.role}
+                          onChange={(e) => handleRoleChange(u.id, e.target.value as any)}
+                        >
+                          <option value="owner" className="bg-[#0f0f11] text-white">Business Owner</option>
+                          <option value="employee" className="bg-[#0f0f11] text-white">Employee</option>
+                          <option value="admin" className="bg-[#0f0f11] text-white">System Admin</option>
+                        </select>
                         <span className={`inline-flex items-center rounded-full border px-2 py-0.5 text-[8px] font-bold ${u.badge}`}>
-                          {u.role.split(" ").pop()}
+                          {u.role.toUpperCase()}
                         </span>
-                        <span className="h-1.5 w-1.5 rounded-full bg-green-400" />
                       </div>
                     </div>
                   );
@@ -178,14 +268,27 @@ export default function DashboardPage() {
           </motion.div>
 
           {/* FastAPI Monte Carlo Queue (5 Cols) */}
-          <motion.div variants={itemVariants} className="lg:col-span-5">
+          <motion.div variants={itemVariants} className="lg:col-span-5 space-y-4">
             <Card className="apple-glass-card border-white/5 p-6 space-y-4">
               <div className="flex items-center justify-between border-b border-white/5 pb-3">
                 <div className="flex items-center gap-2">
                   <Terminal className="h-4.5 w-4.5 text-primary" />
                   <span className="text-xs font-bold text-white uppercase tracking-wider">FastAPI Sim Queue</span>
                 </div>
-                <span className="text-[8px] font-bold uppercase tracking-wider text-muted-foreground">Normal Load</span>
+                <div className="flex gap-1.5">
+                  <button
+                    onClick={runSimPing}
+                    className="text-[9px] bg-primary/10 text-primary border border-primary/20 px-2 py-0.5 rounded-lg font-bold hover:bg-primary/20 transition-all"
+                  >
+                    Run Ping
+                  </button>
+                  <button
+                    onClick={clearConsole}
+                    className="text-[9px] bg-white/5 border border-white/10 px-2 py-0.5 rounded-lg font-bold hover:bg-white/10 text-muted-foreground hover:text-white transition-all"
+                  >
+                    Clear
+                  </button>
+                </div>
               </div>
               <div className="space-y-3">
                 <div className="p-3 rounded-xl bg-white/[0.02] border border-white/5 space-y-1.5">
@@ -198,12 +301,50 @@ export default function DashboardPage() {
                   </div>
                 </div>
                 <div className="p-3 rounded-xl bg-white/[0.02] border border-white/5 space-y-1">
-                  <span className="text-[8px] text-muted-foreground uppercase font-bold block">Calculation Logs</span>
-                  <div className="font-mono text-[9px] text-muted-foreground space-y-1 leading-relaxed mt-1">
-                    <p className="text-green-400">INFO: [Queue] MC Simulation Task started</p>
-                    <p>INFO: [FastAPI] 1000 trials resolved in 1.48s</p>
-                    <p className="text-green-400">INFO: [Queue] Completed task: MC-9023</p>
+                  <span className="text-[8px] text-muted-foreground uppercase font-bold block">Console Output</span>
+                  <div className="font-mono text-[9px] text-muted-foreground space-y-1 leading-relaxed mt-1 max-h-[90px] overflow-y-auto custom-scrollbar">
+                    {consoleLogs.map((log) => (
+                      <p key={log.id} className={log.color}>{log.text}</p>
+                    ))}
+                    {consoleLogs.length === 0 && (
+                      <p className="text-muted-foreground/45 italic">No logs in active buffer.</p>
+                    )}
                   </div>
+                </div>
+              </div>
+            </Card>
+
+            {/* Diagnostic Control Board */}
+            <Card className="apple-glass-card border-white/5 p-4.5 space-y-3">
+              <span className="text-[9px] font-bold uppercase tracking-wider text-muted-foreground block">Diagnostics Controls</span>
+              <div className="grid grid-cols-2 gap-3.5">
+                <div className="space-y-1">
+                  <div className="flex justify-between text-[10px] font-bold">
+                    <span className="text-white/60">DB Conn Pool</span>
+                    <span className="text-primary font-mono">{dbConnections}</span>
+                  </div>
+                  <input
+                    type="range"
+                    min="1"
+                    max="20"
+                    value={dbConnections}
+                    onChange={(e) => setDbConnections(Number(e.target.value))}
+                    className="w-full h-1 bg-white/10 rounded-full appearance-none cursor-pointer accent-primary"
+                  />
+                </div>
+                <div className="space-y-1">
+                  <div className="flex justify-between text-[10px] font-bold">
+                    <span className="text-white/60">Sim Latency</span>
+                    <span className="text-primary font-mono">{latency} ms</span>
+                  </div>
+                  <input
+                    type="range"
+                    min="5"
+                    max="150"
+                    value={latency}
+                    onChange={(e) => setLatency(Number(e.target.value))}
+                    className="w-full h-1 bg-white/10 rounded-full appearance-none cursor-pointer accent-primary"
+                  />
                 </div>
               </div>
             </Card>
@@ -211,24 +352,209 @@ export default function DashboardPage() {
 
         </div>
 
+        {/* ── Admin Grid: Simulated Decisions & Ingestion Streams ── */}
+        <div className="grid gap-6 lg:grid-cols-12 items-start">
+          
+          {/* Global Simulated Scenarios Log (7 Cols) */}
+          <motion.div variants={itemVariants} className="lg:col-span-7">
+            <Card className="apple-glass-card border-white/5 overflow-hidden">
+              <div className="px-5 py-4 border-b border-white/5 flex items-center justify-between">
+                <div>
+                  <h3 className="text-xs font-bold uppercase tracking-wider text-white">Platform Simulation Scenarios</h3>
+                  <p className="text-[9px] text-muted-foreground mt-0.5 font-semibold">Delete or manage configured business simulations globally</p>
+                </div>
+                <span className="text-[9px] bg-primary/10 text-primary border border-primary/20 px-2.5 py-0.5 rounded-full font-bold">
+                  {adminDecisions.length} Active
+                </span>
+              </div>
+              <div className="divide-y divide-white/5">
+                {adminDecisions.map((dec) => (
+                  <div key={dec.id} className="flex items-center justify-between px-5 py-4 hover:bg-white/[0.01]">
+                    <div className="flex items-center gap-3.5 min-w-0">
+                      <div className="h-8.5 w-8.5 rounded-xl bg-white/5 flex items-center justify-center shrink-0">
+                        <BarChart3 className="h-4.5 w-4.5 text-primary" />
+                      </div>
+                      <div className="min-w-0">
+                        <h4 className="text-xs font-bold text-white truncate">{dec.title}</h4>
+                        <p className="text-[9px] text-muted-foreground mt-0.5 truncate font-semibold">
+                          Created by {dec.creator} • {dec.date}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-3.5 shrink-0">
+                      <span className={`inline-flex items-center rounded-full border px-2 py-0.5 text-[8px] font-bold ${
+                        dec.status === "completed" ? "bg-green-500/10 text-green-400 border-green-500/20" : "bg-red-500/10 text-red-400 border-red-500/20"
+                      }`}>
+                        {dec.status.toUpperCase()}
+                      </span>
+                      <button
+                        onClick={() => deleteAdminDecision(dec.id)}
+                        className="text-[9px] text-red-400 hover:text-red-300 font-bold bg-red-500/5 hover:bg-red-500/10 border border-red-500/15 px-2 py-1 rounded-xl transition-all"
+                      >
+                        Purge
+                      </button>
+                    </div>
+                  </div>
+                ))}
+                {adminDecisions.length === 0 && (
+                  <div className="p-8 text-center text-muted-foreground text-xs italic">
+                    All simulation scenarios purged from workspace.
+                  </div>
+                )}
+              </div>
+            </Card>
+          </motion.div>
+
+          {/* Global Data Ingestion Streams (5 Cols) */}
+          <motion.div variants={itemVariants} className="lg:col-span-5">
+            <Card className="apple-glass-card border-white/5 overflow-hidden">
+              <div className="px-5 py-4 border-b border-white/5 flex items-center justify-between">
+                <div>
+                  <h3 className="text-xs font-bold uppercase tracking-wider text-white">Platform Ingested Datasets</h3>
+                  <p className="text-[9px] text-muted-foreground mt-0.5 font-semibold">Remove datasets from Supabase datastore</p>
+                </div>
+                <span className="text-[9px] bg-primary/10 text-primary border border-primary/20 px-2.5 py-0.5 rounded-full font-bold">
+                  {adminDataStreams.length} Files
+                </span>
+              </div>
+              <div className="divide-y divide-white/5">
+                {adminDataStreams.map((stream) => (
+                  <div key={stream.id} className="flex items-center justify-between px-5 py-4 hover:bg-white/[0.01]">
+                    <div className="min-w-0">
+                      <h4 className="text-xs font-bold text-white truncate">{stream.name}</h4>
+                      <p className="text-[9px] text-muted-foreground mt-0.5 truncate font-semibold">
+                        {stream.size} • Uploaded by {stream.uploader.split("@")[0]}
+                      </p>
+                    </div>
+                    <button
+                      onClick={() => deleteDataStream(stream.id)}
+                      className="text-[9px] text-red-400 hover:text-red-300 font-bold bg-red-500/5 hover:bg-red-500/10 border border-red-500/15 px-2 py-1 rounded-xl transition-all shrink-0"
+                    >
+                      Delete
+                    </button>
+                  </div>
+                ))}
+                {adminDataStreams.length === 0 && (
+                  <div className="p-8 text-center text-muted-foreground text-xs italic">
+                    No active file ingestions in database.
+                  </div>
+                )}
+              </div>
+            </Card>
+          </motion.div>
+
+        </div>
+
+        {/* ── Global Monte Carlo Engine Configuration ── */}
+        <motion.div variants={itemVariants}>
+          <Card className="apple-glass-card border-white/5 p-6 space-y-4">
+            <div className="flex items-center justify-between border-b border-white/5 pb-3">
+              <div>
+                <h3 className="text-xs font-bold uppercase tracking-wider text-white">Global Monte Carlo Engine Configuration</h3>
+                <p className="text-[9px] text-muted-foreground mt-0.5 font-semibold">Adjust mathematical solver precision parameters for simulations</p>
+              </div>
+              <span className="text-[9px] bg-green-500/10 text-green-400 border border-green-500/20 px-2.5 py-0.5 rounded-full font-bold">
+                Settings Active
+              </span>
+            </div>
+            <div className="grid gap-6 sm:grid-cols-3">
+              <div className="space-y-1.5">
+                <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider block">Solvers trial count</label>
+                <select
+                  value={mcTrials}
+                  onChange={(e) => {
+                    setMcTrials(Number(e.target.value));
+                    setConsoleLogs(prev => [
+                      ...prev,
+                      { id: Date.now(), text: `INFO: [FastAPI] MC solvers trial count updated to ${e.target.value}`, color: "text-blue-400" }
+                    ]);
+                  }}
+                  className="bg-secondary border border-white/10 text-white text-xs font-bold rounded-xl px-3 py-2 w-full outline-none focus:border-primary cursor-pointer"
+                >
+                  <option value="1000">1,000 Trials (Standard Speed)</option>
+                  <option value="2000">2,000 Trials (Medium Speed)</option>
+                  <option value="5000">5,000 Trials (Deep Accuracy)</option>
+                </select>
+              </div>
+              <div className="space-y-1.5">
+                <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider block">Confidence Intervals</label>
+                <select
+                  value={mcConfidence}
+                  onChange={(e) => {
+                    setMcConfidence(Number(e.target.value));
+                    setConsoleLogs(prev => [
+                      ...prev,
+                      { id: Date.now(), text: `INFO: [FastAPI] Confidence limits adjusted to ${e.target.value}%`, color: "text-blue-400" }
+                    ]);
+                  }}
+                  className="bg-secondary border border-white/10 text-white text-xs font-bold rounded-xl px-3 py-2 w-full outline-none focus:border-primary cursor-pointer"
+                >
+                  <option value="90">90% Confidence limit</option>
+                  <option value="95">95% Confidence limit (Standard)</option>
+                  <option value="99">99% Confidence limit (Strict)</option>
+                </select>
+              </div>
+              <div className="space-y-1.5">
+                <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider block">Solver Priority Mode</label>
+                <div className="grid grid-cols-2 gap-2">
+                  {["fast", "deep"].map((mode) => (
+                    <button
+                      key={mode}
+                      onClick={() => {
+                        setMcSpeed(mode as any);
+                        setConsoleLogs(prev => [
+                          ...prev,
+                          { id: Date.now(), text: `INFO: [FastAPI] Calculation priority changed to: ${mode.toUpperCase()}`, color: "text-blue-400" }
+                        ]);
+                      }}
+                      className={`py-2 rounded-xl text-xs font-bold transition-all border ${
+                        mcSpeed === mode
+                          ? "bg-primary/10 text-primary border-primary/30"
+                          : "bg-white/5 text-muted-foreground border-white/5 hover:text-white"
+                      }`}
+                    >
+                      {mode.toUpperCase()}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </Card>
+        </motion.div>
+
         {/* ── Billing & SME Licenses (12 Cols) ── */}
         <motion.div variants={itemVariants}>
           <Card className="apple-glass-card border-white/5 p-6 space-y-6">
             <div className="flex items-center justify-between border-b border-white/5 pb-4">
               <div>
                 <h3 className="text-xs font-bold uppercase tracking-wider text-white">SME Licenses & Billing Health</h3>
-                <p className="text-[9px] text-muted-foreground mt-0.5 font-semibold">Subscription bands and billing MRR tracking</p>
+                <p className="text-[9px] text-muted-foreground mt-0.5 font-semibold">Simulate monthly subscription multipliers and billing projections</p>
               </div>
-              <div className="flex items-center gap-1.5 text-xs font-bold text-green-400 font-mono">
-                <span className="h-2 w-2 rounded-full bg-green-400 animate-pulse" />
-                <span>₹178,000 MRR</span>
+              <div className="flex items-center gap-3">
+                <div className="flex items-center gap-1.5 text-xs font-bold text-green-400 font-mono bg-green-500/10 border border-green-500/20 px-2.5 py-1 rounded-xl">
+                  <span className="h-2 w-2 rounded-full bg-green-400 animate-pulse" />
+                  <span>₹{Math.round(178000 * mrrMultiplier).toLocaleString()} MRR</span>
+                </div>
+                <div className="flex items-center gap-1.5 text-[10px] font-bold text-white/50">
+                  <span>Multiplier:</span>
+                  <input
+                    type="range"
+                    min="0.5"
+                    max="3.0"
+                    step="0.1"
+                    value={mrrMultiplier}
+                    onChange={(e) => setMrrMultiplier(Number(e.target.value))}
+                    className="w-20 h-1 bg-white/10 rounded-full appearance-none cursor-pointer accent-primary"
+                  />
+                  <span className="font-mono text-primary">{mrrMultiplier.toFixed(1)}x</span>
+                </div>
               </div>
             </div>
             <div className="grid gap-4 sm:grid-cols-3">
               {[
-                { plan: "Free Sandbox", count: "128 licenses", mrr: "₹0", icon: Users, color: "text-blue-400" },
-                { plan: "Startup Pro", count: "24 licenses", mrr: "₹143,976", icon: HardDrive, color: "text-purple-400" },
-                { plan: "Enterprise", count: "1 custom", mrr: "₹34,024", icon: Shield, color: "text-green-400" }
+                { plan: "Free Sandbox", count: Math.round(128 * mrrMultiplier), mrr: "₹0", icon: Users, color: "text-blue-400" },
+                { plan: "Startup Pro", count: Math.round(24 * mrrMultiplier), mrr: `₹${Math.round(143976 * mrrMultiplier).toLocaleString()}`, icon: HardDrive, color: "text-purple-400" },
+                { plan: "Enterprise", count: Math.round(1 * mrrMultiplier), mrr: `₹${Math.round(34024 * mrrMultiplier).toLocaleString()}`, icon: Shield, color: "text-green-400" }
               ].map((sub) => {
                 const Icon = sub.icon;
                 return (
@@ -239,12 +565,12 @@ export default function DashboardPage() {
                       </div>
                       <div>
                         <h4 className="text-xs font-bold text-white">{sub.plan}</h4>
-                        <p className="text-[9px] text-muted-foreground mt-0.5 font-semibold">{sub.count}</p>
+                        <p className="text-[9px] text-muted-foreground mt-0.5 font-semibold">{sub.count} licenses</p>
                       </div>
                     </div>
                     <div className="text-right">
                       <span className="text-sm font-black text-white font-mono">{sub.mrr}</span>
-                      <span className="text-[8px] text-muted-foreground block font-bold uppercase mt-0.5">MRR contribution</span>
+                      <span className="text-[8px] text-muted-foreground block font-bold uppercase mt-0.5">Estimated MRR</span>
                     </div>
                   </div>
                 );
@@ -267,21 +593,21 @@ export default function DashboardPage() {
               <div className="p-4 rounded-xl bg-white/[0.02] border border-white/5 flex justify-between items-center">
                 <div>
                   <span className="text-[10px] text-muted-foreground font-bold uppercase">Flash Model Input</span>
-                  <span className="text-lg font-extrabold text-white mt-1 block font-mono">1,489,200 tokens</span>
+                  <span className="text-lg font-extrabold text-white mt-1 block font-mono">{(1489200 * mrrMultiplier).toLocaleString(undefined, {maximumFractionDigits:0})} tokens</span>
                 </div>
                 <div className="text-right">
                   <span className="text-[10px] text-muted-foreground font-bold uppercase">Cost</span>
-                  <span className="text-base font-extrabold text-green-400 mt-1 block font-mono">₹112.44</span>
+                  <span className="text-base font-extrabold text-green-400 mt-1 block font-mono font-mono">₹{Math.round(112.44 * mrrMultiplier).toLocaleString()}</span>
                 </div>
               </div>
               <div className="p-4 rounded-xl bg-white/[0.02] border border-white/5 flex justify-between items-center">
                 <div>
                   <span className="text-[10px] text-muted-foreground font-bold uppercase">Flash Model Output</span>
-                  <span className="text-lg font-extrabold text-white mt-1 block font-mono">684,500 tokens</span>
+                  <span className="text-lg font-extrabold text-white mt-1 block font-mono font-mono">{(684500 * mrrMultiplier).toLocaleString(undefined, {maximumFractionDigits:0})} tokens</span>
                 </div>
                 <div className="text-right">
                   <span className="text-[10px] text-muted-foreground font-bold uppercase">Cost</span>
-                  <span className="text-base font-extrabold text-green-400 mt-1 block font-mono font-mono">₹156.12</span>
+                  <span className="text-base font-extrabold text-green-400 mt-1 block font-mono font-mono">₹{Math.round(156.12 * mrrMultiplier).toLocaleString()}</span>
                 </div>
               </div>
             </div>
