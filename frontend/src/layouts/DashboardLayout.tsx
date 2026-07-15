@@ -34,6 +34,7 @@ export default function DashboardLayout() {
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [notificationsOpen, setNotificationsOpen] = useState(false);
+  const [profileOpen, setProfileOpen] = useState(false);
 
   // Trigger search palette with Cmd+K / Ctrl+K
   useEffect(() => {
@@ -209,16 +210,54 @@ export default function DashboardLayout() {
             </div>
 
             {/* Profile trigger */}
-            <div className="flex items-center gap-2.5 pl-2 border-l border-border/30">
-              <motion.div 
-                whileHover={{ scale: 1.05 }}
-                className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-primary to-indigo-500 text-white shadow-apple-subtle text-xs font-bold"
+            <div className="relative pl-2 border-l border-border/30">
+              <button 
+                onClick={() => setProfileOpen(prev => !prev)}
+                className="flex items-center gap-2.5 focus:outline-none"
               >
-                {user?.email?.[0].toUpperCase() || "G"}
-              </motion.div>
-              <span className="hidden sm:inline text-xs font-bold max-w-[120px] truncate text-gradient">
-                {user?.email || "Guest User"}
-              </span>
+                <motion.div 
+                  whileHover={{ scale: 1.05 }}
+                  className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-primary to-indigo-500 text-white shadow-apple-subtle text-xs font-bold"
+                >
+                  {user?.email?.[0].toUpperCase() || "G"}
+                </motion.div>
+                <span className="hidden sm:inline text-xs font-bold max-w-[120px] truncate text-gradient">
+                  {user?.email || "Guest User"}
+                </span>
+              </button>
+
+              <AnimatePresence>
+                {profileOpen && (
+                  <>
+                    <div 
+                      className="fixed inset-0 z-40" 
+                      onClick={() => setProfileOpen(false)}
+                    />
+                    <motion.div
+                      initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                      transition={{ type: "spring", stiffness: 350, damping: 25 }}
+                      className="absolute right-0 mt-2.5 w-48 rounded-2xl border border-white/10 dark:border-white/5 bg-card/95 shadow-apple-dialog backdrop-blur-xl p-2 z-50 text-left"
+                    >
+                      <div className="px-3 py-2 border-b border-white/5">
+                        <p className="text-[10px] uppercase font-bold text-muted-foreground tracking-wider">User Account</p>
+                        <p className="text-xs font-semibold text-foreground truncate mt-0.5">{user?.email || "Guest"}</p>
+                      </div>
+                      <button
+                        onClick={() => {
+                          setProfileOpen(false);
+                          handleLogout();
+                        }}
+                        className="flex items-center gap-2.5 w-full px-3 py-2.5 mt-1 rounded-xl text-xs font-bold text-red-500 hover:bg-red-500/10 transition-all text-left"
+                      >
+                        <LogOut className="h-4 w-4" />
+                        <span>Sign Out</span>
+                      </button>
+                    </motion.div>
+                  </>
+                )}
+              </AnimatePresence>
             </div>
           </div>
         </header>

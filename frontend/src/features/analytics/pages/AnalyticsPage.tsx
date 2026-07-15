@@ -18,9 +18,9 @@ import {
   PolarRadiusAxis,
   Radar
 } from "recharts";
-import { 
-  Sparkles, 
-  Sliders, 
+import {
+  Sparkles,
+  Sliders,
   Users,
   Truck
 } from "lucide-react";
@@ -62,8 +62,9 @@ export default function AnalyticsPage() {
   const [glowColor, setGlowColor] = useState("#007aff");
 
   // 2D Canvas refs — no WebGL needed
-  const canvasRef = useRef<HTMLCanvasElement>(null);
   const rafRef = useRef<number>(0);
+  const resizeHandlerRef = useRef<(() => void) | null>(null);
+  const canvasTimerRef = useRef<any>(null);
   const angleRef = useRef({ rx: 0, ry: 0 });
   const speedRef = useRef(rotationSpeed);
   const colorRef = useRef(glowColor);
@@ -132,7 +133,6 @@ export default function AnalyticsPage() {
     }
 
     // Draw cross-section circles for tube wireframe feel
-    const TUBE_STEPS = 8;
     for (let i = 0; i < STEPS; i += Math.floor(STEPS / 40)) {
       const t = (i / STEPS) * Math.PI * 2;
       const cx = (R + r * Math.cos(q * t)) * Math.cos(p * t);
@@ -148,35 +148,42 @@ export default function AnalyticsPage() {
     }
   }, []);
 
-  // ── Start / stop 2D animation loop when tab changes ─────────────
-  useEffect(() => {
-    if (activeTab !== "3d") {
-      cancelAnimationFrame(rafRef.current);
-      return;
+  // ── Callback Ref for direct canvas lifetime management ───────────
+  const canvasRef = useCallback((canvas: HTMLCanvasElement | null) => {
+    // 1. Clear previous timer
+    if (canvasTimerRef.current) {
+      clearTimeout(canvasTimerRef.current);
+      canvasTimerRef.current = null;
+    }
+    // 2. Cancel previous animation frame
+    cancelAnimationFrame(rafRef.current);
+    // 3. Remove previous resize listener
+    if (resizeHandlerRef.current) {
+      window.removeEventListener("resize", resizeHandlerRef.current);
+      resizeHandlerRef.current = null;
     }
 
-    const timer = setTimeout(() => {
-      const canvas = canvasRef.current;
-      if (!canvas) return;
-      const ctx = canvas.getContext("2d");
-      if (!ctx) return;
+    if (!canvas) return;
 
-      // ✅ Set dimensions ONCE — not inside the loop
-      const setSize = () => {
-        const w = canvas.offsetWidth || 600;
-        const h = canvas.offsetHeight || 340;
-        if (canvas.width !== w || canvas.height !== h) {
-          canvas.width = w;
-          canvas.height = h;
-        }
-      };
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    const setSize = () => {
+      const w = canvas.offsetWidth || 600;
+      const h = canvas.offsetHeight || 340;
+      if (canvas.width !== w || canvas.height !== h) {
+        canvas.width = w;
+        canvas.height = h;
+      }
+    };
+
+    // Defer initialization slightly to let AnimatePresence mount layout
+    canvasTimerRef.current = setTimeout(() => {
       setSize();
-
-      // Only update size on window resize, not every frame
       const onResize = () => setSize();
       window.addEventListener("resize", onResize);
+      resizeHandlerRef.current = onResize;
 
-      // ✅ Animation loop — just draw, never touch canvas dimensions
       const loop = () => {
         angleRef.current.ry += 0.006 * speedRef.current;
         angleRef.current.rx += 0.003 * speedRef.current;
@@ -184,22 +191,8 @@ export default function AnalyticsPage() {
         rafRef.current = requestAnimationFrame(loop);
       };
       loop();
-
-      // Store cleanup ref
-      (canvasRef.current as any).__cleanup = () => {
-        cancelAnimationFrame(rafRef.current);
-        window.removeEventListener("resize", onResize);
-      };
     }, 80);
-
-    return () => {
-      clearTimeout(timer);
-      cancelAnimationFrame(rafRef.current);
-      if (canvasRef.current) {
-        (canvasRef.current as any).__cleanup?.();
-      }
-    };
-  }, [activeTab, drawKnot]);
+  }, [drawKnot]);
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -240,11 +233,10 @@ export default function AnalyticsPage() {
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id as any)}
-              className={`relative px-4 py-1.5 rounded-full text-xs font-bold transition-all ${
-                activeTab === tab.id
+              className={`relative px-4 py-1.5 rounded-full text-xs font-bold transition-all ${activeTab === tab.id
                   ? "bg-primary text-white shadow-apple-subtle"
                   : "text-muted-foreground hover:text-white"
-              }`}
+                }`}
             >
               {tab.name}
             </button>
@@ -254,7 +246,7 @@ export default function AnalyticsPage() {
 
       {/* RENDER DYNAMIC SLIDES BASED ON ACTIVE TAB */}
       <AnimatePresence mode="wait">
-        
+
         {/* TAB 1: FINANCIAL TRENDS */}
         {activeTab === "financial" && (
           <motion.div
@@ -279,12 +271,12 @@ export default function AnalyticsPage() {
                     <AreaChart data={financialData}>
                       <defs>
                         <linearGradient id="colorRev" x1="0%" y1="0%" x2="0%" y2="100%">
-                          <stop offset="5%" stopColor="#007aff" stopOpacity={0.2}/>
-                          <stop offset="95%" stopColor="#007aff" stopOpacity={0.0}/>
+                          <stop offset="5%" stopColor="#007aff" stopOpacity={0.2} />
+                          <stop offset="95%" stopColor="#007aff" stopOpacity={0.0} />
                         </linearGradient>
                         <linearGradient id="colorPrf" x1="0%" y1="0%" x2="0%" y2="100%">
-                          <stop offset="5%" stopColor="#10b981" stopOpacity={0.2}/>
-                          <stop offset="95%" stopColor="#10b981" stopOpacity={0.0}/>
+                          <stop offset="5%" stopColor="#10b981" stopOpacity={0.2} />
+                          <stop offset="95%" stopColor="#10b981" stopOpacity={0.0} />
                         </linearGradient>
                       </defs>
                       <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.03)" />
@@ -306,7 +298,7 @@ export default function AnalyticsPage() {
                   <Users className="h-4.5 w-4.5 text-primary" />
                   <span className="text-xs font-bold text-white uppercase tracking-wider">Customer Growth</span>
                 </div>
-                
+
                 <div className="h-48">
                   <ResponsiveContainer width="100%" height="100%">
                     <LineChart data={financialData}>
@@ -318,7 +310,7 @@ export default function AnalyticsPage() {
                     </LineChart>
                   </ResponsiveContainer>
                 </div>
-                
+
                 <p className="text-[10px] text-muted-foreground font-semibold leading-relaxed">
                   Monthly customer counts grew by <span className="text-white font-bold">+158%</span> over Q1-Q2 cycles.
                 </p>
@@ -351,8 +343,8 @@ export default function AnalyticsPage() {
                     <AreaChart data={supplyChainData}>
                       <defs>
                         <linearGradient id="colorInv" x1="0%" y1="0%" x2="0%" y2="100%">
-                          <stop offset="5%" stopColor="#eab308" stopOpacity={0.15}/>
-                          <stop offset="95%" stopColor="#eab308" stopOpacity={0.0}/>
+                          <stop offset="5%" stopColor="#eab308" stopOpacity={0.15} />
+                          <stop offset="95%" stopColor="#eab308" stopOpacity={0.0} />
                         </linearGradient>
                       </defs>
                       <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.03)" />
@@ -374,7 +366,7 @@ export default function AnalyticsPage() {
                   <Truck className="h-4.5 w-4.5 text-primary" />
                   <span className="text-xs font-bold text-white uppercase tracking-wider">Supplier Performance</span>
                 </div>
-                
+
                 <div className="h-48 flex justify-center items-center">
                   <ResponsiveContainer width="100%" height="100%">
                     <RadarChart cx="50%" cy="50%" outerRadius="80%" data={supplierPerformanceData}>
@@ -406,7 +398,7 @@ export default function AnalyticsPage() {
               <Card className="apple-glass border-white/5 p-6 relative overflow-hidden h-[360px] flex items-center justify-center">
                 {/* Floating WebGL Canvas */}
                 <canvas ref={canvasRef} className="w-full h-full cursor-grab active:cursor-grabbing" />
-                
+
                 {/* Visual context tags */}
                 <div className="absolute top-6 left-6 z-10 space-y-1">
                   <h3 className="text-xs font-bold uppercase tracking-wider text-white flex items-center gap-1.5">
@@ -462,9 +454,8 @@ export default function AnalyticsPage() {
                       <button
                         key={col.hex}
                         onClick={() => setGlowColor(col.hex)}
-                        className={`h-6 w-6 rounded-full border transition-all ${
-                          glowColor === col.hex ? "scale-115 border-white ring-2 ring-primary/45" : "border-white/10 hover:scale-105"
-                        }`}
+                        className={`h-6 w-6 rounded-full border transition-all ${glowColor === col.hex ? "scale-115 border-white ring-2 ring-primary/45" : "border-white/10 hover:scale-105"
+                          }`}
                         style={{ backgroundColor: col.hex }}
                         title={col.label}
                       />
