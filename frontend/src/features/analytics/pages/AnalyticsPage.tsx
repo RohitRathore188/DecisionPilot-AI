@@ -1,6 +1,6 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import * as THREE from "three";
+
 import {
   ResponsiveContainer,
   AreaChart,
@@ -61,96 +61,125 @@ export default function AnalyticsPage() {
   const [rotationSpeed, setRotationSpeed] = useState(1.0);
   const [glowColor, setGlowColor] = useState("#007aff");
 
-  // ThreeJS refs
+  // 2D Canvas refs — no WebGL needed
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const rendererRef = useRef<THREE.WebGLRenderer | null>(null);
-  const torusRef = useRef<THREE.Mesh | null>(null);
-  const materialRef = useRef<THREE.MeshBasicMaterial | null>(null);
-  const speedRef = useRef(rotationSpeed);
   const rafRef = useRef<number>(0);
+  const angleRef = useRef({ rx: 0, ry: 0 });
+  const speedRef = useRef(rotationSpeed);
+  const colorRef = useRef(glowColor);
 
-  // Keep speed ref in sync without needing to restart the scene
   useEffect(() => { speedRef.current = rotationSpeed; }, [rotationSpeed]);
+  useEffect(() => { colorRef.current = glowColor; }, [glowColor]);
 
-  // Bootstrap Three.js after the canvas is actually in the DOM with real dimensions
+  // ── Parametric Torus Knot projected with simple perspective ──────
+  const drawKnot = useCallback((ctx: CanvasRenderingContext2D, w: number, h: number, rx: number, ry: number) => {
+    ctx.clearRect(0, 0, w, h);
+
+    // Torus knot parameters: p=2, q=3 (trefoil)
+    const p = 2, q = 3;
+    const R = Math.min(w, h) * 0.28;  // major radius
+    const r = Math.min(w, h) * 0.09;  // tube radius
+    const STEPS = 300;
+    const fov = 800;
+    const camZ = Math.min(w, h) * 1.2;
+
+    const sinRx = Math.sin(rx), cosRx = Math.cos(rx);
+    const sinRy = Math.sin(ry), cosRy = Math.cos(ry);
+
+    // Project 3D → 2D with perspective
+    const project = (x3: number, y3: number, z3: number): [number, number, number] => {
+      // Rotate Y
+      const x1 = x3 * cosRy - z3 * sinRy;
+      const z1 = x3 * sinRy + z3 * cosRy;
+      // Rotate X
+      const y2 = y3 * cosRx - z1 * sinRx;
+      const z2 = y3 * sinRx + z1 * cosRx;
+      const scale = fov / (fov + camZ - z2);
+      return [w / 2 + x1 * scale, h / 2 + y2 * scale, z2];
+    };
+
+    // Collect all projected points
+    const pts: Array<[number, number, number]> = [];
+    for (let i = 0; i <= STEPS; i++) {
+      const t = (i / STEPS) * Math.PI * 2;
+      const x = (R + r * Math.cos(q * t)) * Math.cos(p * t);
+      const y = (R + r * Math.cos(q * t)) * Math.sin(p * t);
+      const z = r * Math.sin(q * t);
+      pts.push(project(x, y, z));
+    }
+
+    // Parse hex color to rgba
+    const hex = colorRef.current.replace("#", "");
+    const cr = parseInt(hex.substring(0, 2), 16);
+    const cg = parseInt(hex.substring(2, 4), 16);
+    const cb = parseInt(hex.substring(4, 6), 16);
+
+    // Draw segments, depth-faded
+    const zMin = Math.min(...pts.map(p => p[2]));
+    const zMax = Math.max(...pts.map(p => p[2]));
+    const zRange = zMax - zMin || 1;
+
+    ctx.lineWidth = 1.2;
+    for (let i = 0; i < pts.length - 1; i++) {
+      const [x1, y1, z1] = pts[i];
+      const [x2, y2] = pts[i + 1];
+      const alpha = 0.15 + 0.7 * ((z1 - zMin) / zRange);
+      ctx.strokeStyle = `rgba(${cr},${cg},${cb},${alpha.toFixed(2)})`;
+      ctx.beginPath();
+      ctx.moveTo(x1, y1);
+      ctx.lineTo(x2, y2);
+      ctx.stroke();
+    }
+
+    // Draw cross-section circles for tube wireframe feel
+    const TUBE_STEPS = 8;
+    for (let i = 0; i < STEPS; i += Math.floor(STEPS / 40)) {
+      const t = (i / STEPS) * Math.PI * 2;
+      const cx = (R + r * Math.cos(q * t)) * Math.cos(p * t);
+      const cy = (R + r * Math.cos(q * t)) * Math.sin(p * t);
+      const cz = r * Math.sin(q * t);
+      const [px, py, pz] = project(cx, cy, cz);
+      const alpha2 = 0.08 + 0.25 * ((pz - zMin) / zRange);
+      const dotR = 1.5 + 1.5 * ((pz - zMin) / zRange);
+      ctx.fillStyle = `rgba(${cr},${cg},${cb},${alpha2.toFixed(2)})`;
+      ctx.beginPath();
+      ctx.arc(px, py, dotR, 0, Math.PI * 2);
+      ctx.fill();
+    }
+  }, []);
+
+  // ── Start / stop 2D animation loop when tab changes ─────────────
   useEffect(() => {
-    if (activeTab !== "3d") return;
+    if (activeTab !== "3d") {
+      cancelAnimationFrame(rafRef.current);
+      return;
+    }
 
-    // Give AnimatePresence time to mount the canvas
     const timer = setTimeout(() => {
       const canvas = canvasRef.current;
       if (!canvas) return;
+      const ctx = canvas.getContext("2d");
+      if (!ctx) return;
 
-      // Use offsetWidth/Height which reflect CSS layout (not 0)
-      const width = canvas.offsetWidth || 600;
-      const height = canvas.offsetHeight || 360;
-
-      const scene = new THREE.Scene();
-      const camera = new THREE.PerspectiveCamera(60, width / height, 0.1, 1000);
-      camera.position.z = 24;
-
-      const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
-      renderer.setSize(width, height, false);
-      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-      rendererRef.current = renderer;
-
-      const geometry = new THREE.TorusKnotGeometry(7, 2.2, 120, 16);
-      const material = new THREE.MeshBasicMaterial({
-        color: new THREE.Color(glowColor),
-        wireframe: true,
-        transparent: true,
-        opacity: 0.45
-      });
-      const knot = new THREE.Mesh(geometry, material);
-      scene.add(knot);
-      torusRef.current = knot;
-      materialRef.current = material;
-
-      const animate = () => {
-        rafRef.current = requestAnimationFrame(animate);
-        knot.rotation.x += 0.003 * speedRef.current;
-        knot.rotation.y += 0.006 * speedRef.current;
-        renderer.render(scene, camera);
-      };
-      animate();
-
-      const handleResize = () => {
-        if (!canvas) return;
+      const loop = () => {
         const w = canvas.offsetWidth || 600;
-        const h = canvas.offsetHeight || 360;
-        camera.aspect = w / h;
-        camera.updateProjectionMatrix();
-        renderer.setSize(w, h, false);
-      };
-      window.addEventListener("resize", handleResize);
+        const h = canvas.offsetHeight || 340;
+        canvas.width = w;
+        canvas.height = h;
 
-      // Store cleanup on the renderer ref so the return can reference it
-      (renderer as any).__cleanup = () => {
-        cancelAnimationFrame(rafRef.current);
-        window.removeEventListener("resize", handleResize);
-        geometry.dispose();
-        material.dispose();
-        renderer.dispose();
-        rendererRef.current = null;
-        torusRef.current = null;
-        materialRef.current = null;
+        angleRef.current.ry += 0.006 * speedRef.current;
+        angleRef.current.rx += 0.003 * speedRef.current;
+        drawKnot(ctx, w, h, angleRef.current.rx, angleRef.current.ry);
+        rafRef.current = requestAnimationFrame(loop);
       };
-    }, 80); // 80 ms is enough for framer-motion enter animation
+      loop();
+    }, 60);
 
     return () => {
       clearTimeout(timer);
-      if (rendererRef.current) {
-        (rendererRef.current as any).__cleanup?.();
-      }
+      cancelAnimationFrame(rafRef.current);
     };
-  }, [activeTab]);
-
-  // Update ThreeJS material properties when dials are adjusted
-  useEffect(() => {
-    if (materialRef.current) {
-      materialRef.current.color.set(glowColor);
-    }
-  }, [glowColor]);
+  }, [activeTab, drawKnot]);
 
   const containerVariants = {
     hidden: { opacity: 0 },
