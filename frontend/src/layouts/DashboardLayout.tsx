@@ -118,7 +118,7 @@ export default function DashboardLayout() {
         </div>
 
         {/* Dynamic Nav Links with Sliding Background Highlight */}
-        <nav className="flex-1 space-y-1.5 px-3 py-6 relative">
+        <nav className="flex-1 space-y-1.5 px-3 py-4 relative overflow-y-auto no-scrollbar">
           {navigation.map((item) => {
             const active = location.pathname === item.href;
             const Icon = item.icon;
