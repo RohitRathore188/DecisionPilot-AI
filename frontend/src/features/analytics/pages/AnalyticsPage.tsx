@@ -161,23 +161,43 @@ export default function AnalyticsPage() {
       const ctx = canvas.getContext("2d");
       if (!ctx) return;
 
-      const loop = () => {
+      // ✅ Set dimensions ONCE — not inside the loop
+      const setSize = () => {
         const w = canvas.offsetWidth || 600;
         const h = canvas.offsetHeight || 340;
-        canvas.width = w;
-        canvas.height = h;
+        if (canvas.width !== w || canvas.height !== h) {
+          canvas.width = w;
+          canvas.height = h;
+        }
+      };
+      setSize();
 
+      // Only update size on window resize, not every frame
+      const onResize = () => setSize();
+      window.addEventListener("resize", onResize);
+
+      // ✅ Animation loop — just draw, never touch canvas dimensions
+      const loop = () => {
         angleRef.current.ry += 0.006 * speedRef.current;
         angleRef.current.rx += 0.003 * speedRef.current;
-        drawKnot(ctx, w, h, angleRef.current.rx, angleRef.current.ry);
+        drawKnot(ctx, canvas.width, canvas.height, angleRef.current.rx, angleRef.current.ry);
         rafRef.current = requestAnimationFrame(loop);
       };
       loop();
-    }, 60);
+
+      // Store cleanup ref
+      (canvasRef.current as any).__cleanup = () => {
+        cancelAnimationFrame(rafRef.current);
+        window.removeEventListener("resize", onResize);
+      };
+    }, 80);
 
     return () => {
       clearTimeout(timer);
       cancelAnimationFrame(rafRef.current);
+      if (canvasRef.current) {
+        (canvasRef.current as any).__cleanup?.();
+      }
     };
   }, [activeTab, drawKnot]);
 
