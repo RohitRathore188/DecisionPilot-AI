@@ -70,7 +70,7 @@ export default function LandingPage() {
       </div>
 
       {/* Floating Header */}
-      <header className="sticky top-4 z-50 w-[92%] max-w-6xl mx-auto rounded-full apple-glass border-white/10 shadow-apple-dock py-3.5 px-6 mt-4">
+      <header className="sticky top-4 z-50 w-[96%] max-w-7xl mx-auto rounded-full apple-glass border-white/10 shadow-apple-dock py-3.5 px-6 mt-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-white shadow-apple-subtle">
@@ -102,7 +102,7 @@ export default function LandingPage() {
       </header>
 
       {/* HERO SECTION with Mouse Parallax & Generated Illustration */}
-      <section className="relative max-w-6xl mx-auto px-6 pt-24 pb-20 grid lg:grid-cols-12 gap-12 items-center">
+      <section className="relative max-w-7xl mx-auto px-8 pt-24 pb-20 grid lg:grid-cols-12 gap-12 items-center">
         
         {/* Left pitch copy */}
         <div className="lg:col-span-6 space-y-6 text-left relative z-10">
@@ -206,7 +206,7 @@ export default function LandingPage() {
       </section>
 
       {/* FEATURES SECTION */}
-      <section id="features" className="max-w-6xl mx-auto px-6 py-28 border-t border-white/5 relative z-10">
+      <section id="features" className="max-w-7xl mx-auto px-8 py-28 border-t border-white/5 relative z-10">
         <div className="text-center max-w-xl mx-auto space-y-3 mb-16">
           <span className="text-xs font-bold text-primary uppercase tracking-wider">Features Suite</span>
           <h2 className="text-3xl font-extrabold tracking-tight text-white sm:text-4xl">
@@ -253,7 +253,7 @@ export default function LandingPage() {
       </section>
 
       {/* HOW IT WORKS SECTION */}
-      <section className="max-w-6xl mx-auto px-6 py-20 border-t border-white/5 relative z-10">
+      <section className="max-w-7xl mx-auto px-8 py-20 border-t border-white/5 relative z-10">
         <div className="text-center max-w-xl mx-auto space-y-3 mb-16">
           <span className="text-xs font-bold text-primary uppercase tracking-wider">Process Pipeline</span>
           <h2 className="text-3xl font-extrabold tracking-tight text-white sm:text-4xl">
@@ -277,7 +277,7 @@ export default function LandingPage() {
       </section>
 
       {/* INTERACTIVE DEMO SANDBOX (Visual AI Simulator Tool) */}
-      <section id="sandbox" className="max-w-6xl mx-auto px-6 py-24 border-t border-white/5 relative z-10">
+      <section id="sandbox" className="max-w-7xl mx-auto px-8 py-24 border-t border-white/5 relative z-10">
         <div className="grid lg:grid-cols-12 gap-12 items-center">
           <div className="lg:col-span-5 space-y-5 text-left">
             <span className="text-xs font-bold text-primary uppercase tracking-wider">Visual AI Simulator</span>
@@ -377,7 +377,7 @@ export default function LandingPage() {
       </section>
 
       {/* CUSTOMER TESTIMONIALS SECTION */}
-      <section className="max-w-6xl mx-auto px-6 py-20 border-t border-white/5 relative z-10">
+      <section className="max-w-7xl mx-auto px-8 py-20 border-t border-white/5 relative z-10">
         <div className="text-center max-w-xl mx-auto space-y-3 mb-16">
           <span className="text-xs font-bold text-primary uppercase tracking-wider">Testimonials</span>
           <h2 className="text-3xl font-extrabold tracking-tight text-white sm:text-4xl">
@@ -417,7 +417,7 @@ export default function LandingPage() {
       </section>
 
       {/* PRICING SECTION */}
-      <section id="pricing" className="max-w-6xl mx-auto px-6 py-24 border-t border-white/5 relative z-10">
+      <section id="pricing" className="max-w-7xl mx-auto px-8 py-24 border-t border-white/5 relative z-10">
         <div className="text-center max-w-xl mx-auto space-y-3 mb-16">
           <span className="text-xs font-bold text-primary uppercase tracking-wider">Flexible Plans</span>
           <h2 className="text-3xl font-extrabold tracking-tight text-white sm:text-4xl">
@@ -458,7 +458,7 @@ export default function LandingPage() {
       </section>
 
       {/* FAQ SECTION with Accordion */}
-      <section id="faq" className="max-w-4xl mx-auto px-6 py-20 border-t border-white/5 relative z-10">
+      <section id="faq" className="max-w-5xl mx-auto px-8 py-20 border-t border-white/5 relative z-10">
         <div className="text-center space-y-3 mb-12">
           <span className="text-xs font-bold text-primary uppercase tracking-wider">FAQ</span>
           <h2 className="text-3xl font-extrabold tracking-tight text-white">
@@ -503,7 +503,7 @@ export default function LandingPage() {
       </section>
 
       {/* FOOTER SECTION */}
-      <footer className="max-w-6xl mx-auto px-6 py-16 border-t border-white/5 relative z-10 flex flex-col md:flex-row items-center justify-between gap-6">
+      <footer className="max-w-7xl mx-auto px-8 py-16 border-t border-white/5 relative z-10 flex flex-col md:flex-row items-center justify-between gap-6">
         <div className="flex items-center gap-2">
           <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-primary text-white shadow-apple-subtle">
             <Activity className="h-4 w-4" />
