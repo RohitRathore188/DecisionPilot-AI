@@ -20,7 +20,8 @@ import {
   Network,
   Package,
   Truck,
-  FileText
+  FileText,
+  UploadCloud
 } from "lucide-react";
 
 export default function DashboardLayout() {
@@ -55,6 +56,7 @@ export default function DashboardLayout() {
     { name: "Inventory Intel", href: "/inventory", icon: Package },
     { name: "Supplier Intel", href: "/suppliers", icon: Truck },
     { name: "Fulfillment Reports", href: "/reports", icon: FileText },
+    { name: "Data Ingestion", href: "/ingestion", icon: UploadCloud },
     { name: "Simulate Decision", href: "/decisions/new", icon: PlusCircle },
     { name: "Settings", href: "/settings", icon: SettingsIcon },
   ];
