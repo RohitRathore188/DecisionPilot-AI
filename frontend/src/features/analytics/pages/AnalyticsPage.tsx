@@ -61,72 +61,87 @@ export default function AnalyticsPage() {
   const [rotationSpeed, setRotationSpeed] = useState(1.0);
   const [glowColor, setGlowColor] = useState("#007aff");
 
-  // ThreeJS canvas setup reference
+  // ThreeJS refs
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const rendererRef = useRef<THREE.WebGLRenderer | null>(null);
   const torusRef = useRef<THREE.Mesh | null>(null);
   const materialRef = useRef<THREE.MeshBasicMaterial | null>(null);
+  const speedRef = useRef(rotationSpeed);
+  const rafRef = useRef<number>(0);
 
+  // Keep speed ref in sync without needing to restart the scene
+  useEffect(() => { speedRef.current = rotationSpeed; }, [rotationSpeed]);
+
+  // Bootstrap Three.js after the canvas is actually in the DOM with real dimensions
   useEffect(() => {
-    if (!canvasRef.current) return;
+    if (activeTab !== "3d") return;
 
-    const width = canvasRef.current.clientWidth;
-    const height = canvasRef.current.clientHeight;
+    // Give AnimatePresence time to mount the canvas
+    const timer = setTimeout(() => {
+      const canvas = canvasRef.current;
+      if (!canvas) return;
 
-    const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(60, width / height, 0.1, 1000);
-    const renderer = new THREE.WebGLRenderer({
-      canvas: canvasRef.current,
-      alpha: true,
-      antialias: true
-    });
-    
-    renderer.setSize(width, height, false);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      // Use offsetWidth/Height which reflect CSS layout (not 0)
+      const width = canvas.offsetWidth || 600;
+      const height = canvas.offsetHeight || 360;
 
-    // Torus knot geometry for futuristic 3D node representation
-    const geometry = new THREE.TorusKnotGeometry(7, 2.2, 120, 16);
-    const material = new THREE.MeshBasicMaterial({
-      color: new THREE.Color(glowColor),
-      wireframe: true,
-      transparent: true,
-      opacity: 0.35
-    });
-    
-    const torusKnot = new THREE.Mesh(geometry, material);
-    scene.add(torusKnot);
-    
-    torusRef.current = torusKnot;
-    materialRef.current = material;
+      const scene = new THREE.Scene();
+      const camera = new THREE.PerspectiveCamera(60, width / height, 0.1, 1000);
+      camera.position.z = 24;
 
-    camera.position.z = 24;
+      const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
+      renderer.setSize(width, height, false);
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      rendererRef.current = renderer;
 
-    let animationFrameId: number;
-    const animate = () => {
-      if (torusRef.current) {
-        torusRef.current.rotation.x += 0.003 * rotationSpeed;
-        torusRef.current.rotation.y += 0.006 * rotationSpeed;
-      }
-      renderer.render(scene, camera);
-      animationFrameId = requestAnimationFrame(animate);
-    };
-    animate();
+      const geometry = new THREE.TorusKnotGeometry(7, 2.2, 120, 16);
+      const material = new THREE.MeshBasicMaterial({
+        color: new THREE.Color(glowColor),
+        wireframe: true,
+        transparent: true,
+        opacity: 0.45
+      });
+      const knot = new THREE.Mesh(geometry, material);
+      scene.add(knot);
+      torusRef.current = knot;
+      materialRef.current = material;
 
-    const handleResize = () => {
-      if (!canvasRef.current) return;
-      const w = canvasRef.current.clientWidth;
-      const h = canvasRef.current.clientHeight;
-      camera.aspect = w / h;
-      camera.updateProjectionMatrix();
-      renderer.setSize(w, h, false);
-    };
-    window.addEventListener("resize", handleResize);
+      const animate = () => {
+        rafRef.current = requestAnimationFrame(animate);
+        knot.rotation.x += 0.003 * speedRef.current;
+        knot.rotation.y += 0.006 * speedRef.current;
+        renderer.render(scene, camera);
+      };
+      animate();
+
+      const handleResize = () => {
+        if (!canvas) return;
+        const w = canvas.offsetWidth || 600;
+        const h = canvas.offsetHeight || 360;
+        camera.aspect = w / h;
+        camera.updateProjectionMatrix();
+        renderer.setSize(w, h, false);
+      };
+      window.addEventListener("resize", handleResize);
+
+      // Store cleanup on the renderer ref so the return can reference it
+      (renderer as any).__cleanup = () => {
+        cancelAnimationFrame(rafRef.current);
+        window.removeEventListener("resize", handleResize);
+        geometry.dispose();
+        material.dispose();
+        renderer.dispose();
+        rendererRef.current = null;
+        torusRef.current = null;
+        materialRef.current = null;
+      };
+    }, 80); // 80 ms is enough for framer-motion enter animation
 
     return () => {
-      cancelAnimationFrame(animationFrameId);
-      window.removeEventListener("resize", handleResize);
-      geometry.dispose();
-      material.dispose();
-      renderer.dispose();
+      clearTimeout(timer);
+      if (rendererRef.current) {
+        (rendererRef.current as any).__cleanup?.();
+      }
     };
   }, [activeTab]);
 
